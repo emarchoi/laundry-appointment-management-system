@@ -4,6 +4,7 @@ import com.laundry.config.DatabaseConnection;
 import com.laundry.models.Customer;
 import com.laundry.services.CustomerService;
 import java.sql.Connection;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -20,16 +21,39 @@ public class Main {
 
         System.out.println("\n--- Phase 2: Testing Customer Insertion ---");
         CustomerService service = new CustomerService();
+
+        Scanner sc = new Scanner(System.in);
+        
+        System.out.print("Enter Reference Number: ");
+        String referenceNumber = sc.nextLine();
+
+        System.out.print("Enter First Name: ");
+        String fullName = sc.nextLine();
+
+        System.out.print("Enter Last Name: ");
+        String lastName = sc.nextLine();
+
+        System.out.print("Enter Phone Number: ");
+        String phoneNumber = sc.nextLine();
+
+        System.out.print("Enter Barangay: ");
+        String barangay = sc.nextLine();
+
+        System.out.print("Enter Street: ");
+        String street = sc.nextLine();
+
+        System.out.print("Enter Block No: ");
+        String blockNo = sc.nextLine();
         
         // Create a dummy customer matching your SQL schema
         Customer testCustomer = new Customer(
-            "12350", 
-            "Juan", 
-            "Dela Cruz", 
-            "09123456789", 
-            "San Jose", 
-            "Mabini St", 
-            "Block 4"
+                referenceNumber,
+                fullName,
+                lastName,
+                phoneNumber,
+                barangay,
+                street,
+                blockNo
         );
 
         try {

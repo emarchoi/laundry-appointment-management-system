@@ -1,4 +1,3 @@
-# Rename a copy of this file to config.properties and fill in your details
-DB_URL=jdbc:sqlserver://localhost:1433;databaseName=IM_FP_S;encrypt=true;trustServerCertificate=true;
+DB_URL=jdbc:sqlserver://localhost:1433;databaseName=LaundryAppointmentSystemDB;encrypt=true;trustServerCertificate=true;
 DB_USER=laundry_user
-DB_PASSWORD=your_password_here
+DB_PASSWORD=Laundry
