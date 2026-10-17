@@ -1,4 +1,4 @@
-package com.laundry.modelsuser;
+package com.laundry.userclass;
 
 // Abstract class: User (Inherited by Customer and Staff class)
 public abstract class User {

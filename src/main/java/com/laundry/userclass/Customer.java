@@ -1,4 +1,4 @@
-package com.laundry.modelsuser;
+package com.laundry.userclass;
 
 public class Customer extends User{
 

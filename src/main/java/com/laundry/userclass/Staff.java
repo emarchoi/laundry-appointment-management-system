@@ -1,4 +1,4 @@
-package com.laundry.modelsuser;
+package com.laundry.userclass;
 
 // Abstract Class Staff: Inherited by DeliveryRider and LaundryAttendant
 public abstract class Staff extends User{
