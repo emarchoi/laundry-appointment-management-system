@@ -1,0 +1,11 @@
+# Compiled class files
+target/
+*.class
+
+# IDE specific files
+.vscode/
+nbproject/
+.idea/
+
+# Environment Configuration (CRITICAL: Do not commit actual passwords)
+config.properties
