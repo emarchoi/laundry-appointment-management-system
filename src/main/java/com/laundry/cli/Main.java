@@ -1,11 +1,11 @@
 package com.laundry.cli;
 
-import com.laundry.config.DatabaseConnection;
-import com.laundry.models.Customer;
-import com.laundry.util.CustomerService;
-
 import java.sql.Connection;
 import java.util.Scanner;
+
+import com.laundry.config.DatabaseConnection;
+import com.laundry.userclass.Customer;
+import com.laundry.util.CustomerService;
 
 public class Main {
     public static void main(String[] args) {

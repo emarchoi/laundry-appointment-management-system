@@ -1,4 +1,4 @@
-package com.laundry.ui.menus;
+package com.laundry.cli.menus;
 
 import java.util.Scanner;
 
