@@ -1,6 +1,7 @@
 package com.laundry.util;
 
-import com.laundry.systemclass.LaundryOrder;
+import com.laundry.systemclass.Appointment;
+import com.laundry.systemclass.MachineUsage;
 import com.laundry.machineclass.*;
 
 // Machine Usage
@@ -19,5 +20,17 @@ public class MachineService {
             return 0;
         }
         return totalWeightKg / machinesUsed;
+    }
+
+    public void computeAndSetECF(Appointment appointment, List<MachineUsage> machines) {
+
+        int totalMinutes = 0;
+
+        for(MachineUsage machine : machines) {
+
+            totalMinutes += machine.getLaundryDuration();
+        }
+
+        appointment.setECF(totalMinutes);
     }
 }

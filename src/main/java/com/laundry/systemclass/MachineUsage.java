@@ -10,13 +10,13 @@ public class MachineUsage {
     private LocalTime laundryStartTime;
     private int laundryDuration;
 
-    public MachineUsage(int orderId, int machineId, double laundryLoad, double priceCharge, LocalTime laundryStartTime, int laundryDuration) {
+    public MachineUsage(int orderId, int machineId, double laundryLoad, double priceCharge, LocalTime laundryStartTime) {
         this.orderId = orderId;
         this.machineId = machineId;
         this.laundryLoad = laundryLoad;
         this.priceCharge = priceCharge;
         this.laundryStartTime = laundryStartTime;
-        this.laundryDuration = laundryDuration;
+        this.laundryDuration = 60; 
     }
 
     public int getOrderId() { return orderId; }
