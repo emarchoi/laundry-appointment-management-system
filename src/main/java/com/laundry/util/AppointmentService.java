@@ -1,4 +1,6 @@
-package com.laundry.services;
+package com.laundry.util;
+
+import java.util.List;
 
 import com.laundry.dao.AppointmentDAO;
 import com.laundry.dao.LaundryOrderDAO;
@@ -6,8 +8,6 @@ import com.laundry.dao.PaymentDAO;
 import com.laundry.systemclass.Appointment;
 import com.laundry.systemclass.LaundryOrder;
 import com.laundry.systemclass.Payment;
-
-import java.util.List;
 
 public class AppointmentService {
     private AppointmentDAO appointmentDAO = new AppointmentDAO();
@@ -18,7 +18,7 @@ public class AppointmentService {
     public Appointment getFullAppointmentDetails(String referenceNumber) {
         
         // 1. Get the base appointment from the database
-        List<Appointment> appointments = appointmentDAO.getAppointmentsByReference(referenceNumber);
+        List<Appointment> appointments = appointmentDAO.getAppointmentByReference(referenceNumber);
         if (appointments.isEmpty()) {
             return null; // Appointment not found
         }
@@ -34,7 +34,7 @@ public class AppointmentService {
         Payment payment = paymentDAO.getPaymentByAppointment(appt.getAppointmentId());
         if (payment != null) {
             // Set the amount to be paid based on the orders' total price calculation
-            payment.setAmountToBePaid(appt.getTotalPrice()); 
+            payment.setAmountToBePaid(appt.getAppointmentTotalPrice()); 
             appt.setPayment(payment);
         }
 
