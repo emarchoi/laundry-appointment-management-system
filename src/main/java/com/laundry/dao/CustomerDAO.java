@@ -1,10 +1,11 @@
 package com.laundry.dao;
 
-import com.laundry.config.DatabaseConnection;
-import com.laundry.models.Customer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import com.laundry.config.DatabaseConnection;
+import com.laundry.userclass.Customer;
 
 public class CustomerDAO {
     // Example CRUD Operation
