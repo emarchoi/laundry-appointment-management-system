@@ -22,7 +22,6 @@ public class CustomerDAO {
             s.setString(5, customer.getBarangay());
             s.setString(6, customer.getStreet());
             s.setString(7, customer.getBlockNo());
-            // ... set remaining parameters
             
             return s.executeUpdate() > 0;
             

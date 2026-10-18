@@ -48,8 +48,7 @@ public class MachineUsageDAO {
                         rs.getInt("MachineID"),
                         rs.getDouble("LaundryLoadKg"),
                         rs.getDouble("PriceCharged"),
-                        rs.getTime("LaundryStartTime").toLocalTime(),
-                        rs.getInt("LaundryDuration")
+                        rs.getTime("LaundryStartTime").toLocalTime()
                     );
                     usages.add(usage);
                 }

@@ -29,7 +29,7 @@ public class Main {
         String referenceNumber = sc.nextLine();
 
         System.out.print("Enter First Name: ");
-        String fullName = sc.nextLine();
+        String firstName = sc.nextLine();
 
         System.out.print("Enter Last Name: ");
         String lastName = sc.nextLine();
@@ -48,9 +48,9 @@ public class Main {
         
         // Create a dummy customer matching your SQL schema
         Customer testCustomer = new Customer(
-                referenceNumber,
-                fullName,
+                firstName,
                 lastName,
+                referenceNumber,
                 phoneNumber,
                 barangay,
                 street,
