@@ -8,7 +8,7 @@ import java.util.*;
 
 public class MachineDAO {
 
-    // 1. GET ALL MACHINES (Filtered by Type: "Washer" or "Dryer")
+    // 1. GET ALL MACHINES (Enter Machine Type: Washer / Dryer)
     public List<Machine> getMachinesByType(String machineType) {
 
         List<Machine> machines = new ArrayList<>();
@@ -38,5 +38,26 @@ public class MachineDAO {
             System.err.println("Database Error (Get Machines): " + e.getMessage());
         }
         return machines;
+    }
+
+    // 2. UPDATE MACHINE STATUS (Available -> In Use)
+    public boolean updateMachineStatus(int machineId, String newStatus) {
+
+        String q = "UPDATE Machine "
+                + " SET MachineStatus = ? "
+                + " WHERE MachineID = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection(); 
+            PreparedStatement s = conn.prepareStatement(q)) {
+
+            s.setString(1, newStatus);
+            s.setInt(2, machineId);
+
+            return s.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Database Error (Update Machine) " + e.getMessage());
+            return false;
+        }
     }
 }
