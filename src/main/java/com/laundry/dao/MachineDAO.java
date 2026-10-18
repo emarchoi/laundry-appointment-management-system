@@ -44,8 +44,8 @@ public class MachineDAO {
     public boolean updateMachineStatus(int machineId, String newStatus) {
 
         String q = "UPDATE Machine "
-                + " SET MachineStatus = ? "
-                + " WHERE MachineID = ?";
+                + "SET MachineStatus = ? "
+                + "WHERE MachineID = ?";
         
         try (Connection conn = DatabaseConnection.getConnection(); 
             PreparedStatement s = conn.prepareStatement(q)) {
