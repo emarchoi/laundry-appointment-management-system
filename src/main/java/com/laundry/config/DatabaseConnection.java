@@ -8,8 +8,9 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class DatabaseConnection {
-    private static Properties properties = new Properties();
 
+    private static Properties properties = new Properties();
+    
     static {
         try (FileInputStream fis = new FileInputStream("config.properties")) {
             properties.load(fis);
