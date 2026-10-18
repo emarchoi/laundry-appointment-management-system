@@ -91,33 +91,33 @@ public class AppointmentDAO {
 
     // 3. FULL UPDATE (Used by Attendant/Rider to update Status, StaffID, Price, and ECF)
     public boolean updateAppointment(Appointment appointment) {
-        String query = "UPDATE Appointment SET StaffID = ?, AppointmentStatus = ?, "
+        String q = "UPDATE Appointment SET StaffID = ?, AppointmentStatus = ?, "
                         + "AppointmentTotalPrice = ?, EstimatedCompletionFinished = ? "
                         + "WHERE AppointmentID = ?";
         
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement s = conn.prepareStatement(q)) {
              
             // Safely set StaffID to NULL if unassigned
             if (appointment.getStaffId() == null) {
-                stmt.setNull(1, Types.INTEGER);
+                s.setNull(1, Types.INTEGER);
             } else {
-                stmt.setInt(1, appointment.getStaffId());
+                s.setInt(1, appointment.getStaffId());
             }
             
-            stmt.setString(2, appointment.getAppointmentStatus());
-            stmt.setDouble(3, appointment.getAppointmentTotalPrice());
+            s.setString(2, appointment.getAppointmentStatus());
+            s.setDouble(3, appointment.getAppointmentTotalPrice());
             
             // Safely set ECF to NULL if it is 0
             if (appointment.getECF() == 0) {
-                stmt.setNull(4, Types.INTEGER);
+                s.setNull(4, Types.INTEGER);
             } else {
-                stmt.setInt(4, appointment.getECF());
+                s.setInt(4, appointment.getECF());
             }
             
-            stmt.setInt(5, appointment.getAppointmentId());
+            s.setInt(5, appointment.getAppointmentId());
             
-            return stmt.executeUpdate() > 0;
+            return s.executeUpdate() > 0;
             
         } catch (SQLException e) {
             System.err.println("Database Error (Update Appointment): " + e.getMessage());
