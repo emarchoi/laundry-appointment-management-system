@@ -1,8 +1,11 @@
 package com.laundry.machineclass;
 
 public class Dryer extends Machine {
-    public Dryer(int machineId, double basePrice, String machineStatus) {
-        super(machineId, basePrice, machineStatus);
+
+    private static final double DRYER_PRICE = 65.0;
+
+    public Dryer(int machineId, String machineStatus) {
+        super(machineId, DRYER_PRICE, machineStatus);
     }
 
     @Override

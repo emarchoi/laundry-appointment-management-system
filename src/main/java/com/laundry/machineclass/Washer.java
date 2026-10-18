@@ -1,8 +1,11 @@
 package com.laundry.machineclass;
 
 public class Washer extends Machine {
-    public Washer(int machineId, double basePrice, String machineStatus) {
-        super(machineId, basePrice, machineStatus);
+
+    private static final double WASHER_PRICE = 50.0;
+
+    public Washer(int machineId, String machineStatus) {
+        super(machineId, WASHER_PRICE, machineStatus);
     }
 
     @Override
