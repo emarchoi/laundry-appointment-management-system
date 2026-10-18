@@ -7,7 +7,7 @@ public class CustomerService {
     private CustomerDAO customerDAO = new CustomerDAO();
 
     public boolean registerCustomer(Customer customer) {
-        // Input validation rule
+        
         if (customer.getPhoneNumber() == null || customer.getPhoneNumber().length() != 11) {
             throw new IllegalArgumentException("Phone number must be exactly 11 digits.");
         }
