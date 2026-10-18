@@ -1,7 +1,7 @@
-package com.laundry.services;
+package com.laundry.util;
 
 import com.laundry.dao.CustomerDAO;
-import com.laundry.models.Customer;
+import com.laundry.userclass.Customer;
 
 public class CustomerService {
     private CustomerDAO customerDAO = new CustomerDAO();

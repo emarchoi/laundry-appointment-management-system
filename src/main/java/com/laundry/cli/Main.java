@@ -2,7 +2,8 @@ package com.laundry.cli;
 
 import com.laundry.config.DatabaseConnection;
 import com.laundry.models.Customer;
-import com.laundry.services.CustomerService;
+import com.laundry.util.CustomerService;
+
 import java.sql.Connection;
 import java.util.Scanner;
 

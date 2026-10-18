@@ -1,4 +1,4 @@
-package com.laundry.services;
+package com.laundry.util;
 
 import com.laundry.systemclass.LaundryOrder;
 import com.laundry.machineclass.*;
