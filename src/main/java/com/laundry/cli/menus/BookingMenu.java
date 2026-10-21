@@ -1,6 +1,8 @@
 package com.laundry.cli.menus;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -26,6 +28,7 @@ public class BookingMenu {
         this.scanner = scanner;
     }
 
+    // DISPLAY MENU
     public void display() {
         boolean inBookingMenu = true;
 
@@ -62,6 +65,7 @@ public class BookingMenu {
         }
     }
 
+    // CREATE APPOINTMENT
     private void createAppointment() {
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|                ENTER PERSONAL DETAILS              |");
@@ -91,7 +95,7 @@ public class BookingMenu {
         System.out.println("+------------------------------------------------------+");
         System.out.println("|               -> DETAILS REGISTERED!                 |");
         System.out.println("+------------------------------------------------------+");
-        System.out.println("\n+------------------------------------------------------+");
+        System.out.println("+------------------------------------------------------+");
         System.out.println("| [!] PLEASE SAVE THIS REFERENCE NUMBER FOR FUTURE USE |");
         System.out.println("+------------------------------------------------------+");
         System.out.println("| Reference Number: " + refNum);
@@ -123,8 +127,11 @@ public class BookingMenu {
         boolean addingOrders = true;
         int orderCounter = 1;
 
+        // List For Order Summary Later
+        List<String> orderSummaries = new ArrayList<>();
         while (addingOrders) {
             System.out.println("| Select Service for Order #" + orderCounter + ":");
+            System.out.println("+----------------------------------------------------+");
             System.out.println("| [1] Wash                                           |");
             System.out.println("| [2] Dry                                            |");
             System.out.println("| [3] Wash and Dry                                   |");
@@ -136,7 +143,9 @@ public class BookingMenu {
 
             if (serviceChoice.equals("0")) {
                 if (orderCounter == 1) {
+                    System.out.println("\n+----------------------------------------------------+");
                     System.out.println("| You must add at least one order!                   |");
+                    System.out.println("+----------------------------------------------------+");
                     continue;
                 }
                 addingOrders = false;
@@ -149,7 +158,9 @@ public class BookingMenu {
                 case "2": serviceName = "Dry"; break;
                 case "3": serviceName = "Wash and Dry"; break;
                 default: 
-                    System.out.println("| Invalid service. Try again.                        |"); 
+                System.out.println("+----------------------------------------------------+");
+                    System.out.println("| Invalid service. Try again.                        |");
+                    System.out.println("+----------------------------------------------------+"); 
                     continue;
             }
 
@@ -159,10 +170,13 @@ public class BookingMenu {
             if (orderDAO.addOrder(order)) {
                 System.out.println("\n+----------------------------------------------------+");
                 System.out.println("| -> " + serviceName + " order added to appointment.");
-                System.out.println("+----------------------------------------------------+");
+                System.out.println("+----------------------------------------------------+\n");
+                orderSummaries.add(serviceName);
                 orderCounter++;
             } else {
+                System.out.println("+----------------------------------------------------+");
                 System.out.println("| ERROR: Could not save order.                       |");
+                System.out.println("+----------------------------------------------------+");
             }
         }
 
@@ -170,16 +184,31 @@ public class BookingMenu {
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|         APPOINTMENT CREATED SUCCESSFULLY!          |");
         System.out.println("+----------------------------------------------------+");
+
+        System.out.println("\n+----------------------------------------------------+");
+        System.out.println("|                APPOINTMENT SUMMARY                 |");
+        System.out.println("+----------------------------------------------------+");
         System.out.println("| Reference Number : " + refNum);
         System.out.println("| Appointment ID   : " + appointmentId);
         System.out.println("| Type             : " + appointmentType);
         System.out.println("| Status           : Pending (Awaiting Attendant)    |");
+        System.out.println("+----------------------------------------------------+");
+        System.out.println("+----------------------------------------------------+");
+        System.out.println("|                   ORDER SUMMARY                    |");
+        System.out.println("+----------------------------------------------------+");
+        
+        // Loop through the tracked orders and print them perfectly aligned
+        for (int i = 0; i < orderSummaries.size(); i++) {
+            System.out.println(String.format("| %-50s |", "Order #" + (i + 1) + "         : " + orderSummaries.get(i)));
+        }
+        
         System.out.println("+----------------------------------------------------+\n");
     }
 
+    // VIEW APPOINTMENT
     private void viewAppointment() {
         System.out.println("\n+----------------------------------------------------+");
-        System.out.println("|                2. VIEW APPOINTMENT                 |");
+        System.out.println("|                  VIEW APPOINTMENT                  |");
         System.out.println("+----------------------------------------------------+");
         System.out.print("| Enter Reference Number: ");
         String refNum = scanner.nextLine();
@@ -187,6 +216,7 @@ public class BookingMenu {
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
         
         if (appt == null) {
+            System.out.println("+----------------------------------------------------+");
             System.out.println("| ERROR: No appointment found for: " + refNum);
             System.out.println("+----------------------------------------------------+");
             return;
@@ -197,17 +227,19 @@ public class BookingMenu {
         System.out.println("+----------------------------------------------------+");
         System.out.println("| Reference Number : " + appt.getReferenceNumber());
         System.out.println("| Appointment ID   : " + appt.getAppointmentId());
+        System.out.println("| ");
         System.out.println("| Type             : " + appt.getAppointmentType());
         System.out.println("| Status           : " + appt.getAppointmentStatus());
-        System.out.println("| Total Price      : PHP " + appt.getAppointmentTotalPrice());
-        
+
         if (appt.getECF() > 0) {
             System.out.println("| Est. Duration    : " + appt.getECF() + " minutes");
         } else {
             System.out.println("| Est. Duration    : Pending Assignment");
         }
 
-        System.out.println("| Payment Status   : " + (appt.isPaid() ? "PAID" : "PENDING"));
+        System.out.println("| ");
+        System.out.println("| Total Price      : PHP " + appt.getAppointmentTotalPrice());
+        System.out.println("| Payment Status   : " + (appt.isPaid() ? "" : "Pending"));
         System.out.println("+----------------------------------------------------+");
 
         if (!appt.isPaid() && appt.getAppointmentTotalPrice() > 0) {
@@ -226,7 +258,7 @@ public class BookingMenu {
 
     private void cancelAppointment() {
         System.out.println("\n+----------------------------------------------------+");
-        System.out.println("|               3. CANCEL APPOINTMENT                |");
+        System.out.println("|                 CANCEL APPOINTMENT                 |");
         System.out.println("+----------------------------------------------------+");
         System.out.print("| Enter Reference Number: ");
         String refNum = scanner.nextLine();
@@ -234,6 +266,7 @@ public class BookingMenu {
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
         
         if (appt == null) {
+            System.out.println("+----------------------------------------------------+");
             System.out.println("| ERROR: No appointment found.                       |");
             System.out.println("+----------------------------------------------------+");
             return;
@@ -246,12 +279,15 @@ public class BookingMenu {
             if (confirm.equalsIgnoreCase("Y")) {
                 appt.setAppointmentStatus("Cancelled");
                 if (appointmentDAO.updateAppointment(appt)) {
+                    System.out.println("+----------------------------------------------------+");
                     System.out.println("| -> Appointment successfully cancelled.             |");
                 } else {
+                    System.out.println("+----------------------------------------------------+");
                     System.out.println("| ERROR: Could not cancel appointment in database.   |");
                 }
             }
         } else {
+            System.out.println("+----------------------------------------------------+");
             System.out.println("| ERROR: Cannot cancel. Status is: " + appt.getAppointmentStatus());
         }
         System.out.println("+----------------------------------------------------+");
