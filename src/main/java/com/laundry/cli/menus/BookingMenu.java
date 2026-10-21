@@ -123,13 +123,13 @@ public class BookingMenu {
 
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|                 ADD LAUNDRY ORDERS                 |");
-        System.out.println("+----------------------------------------------------+");
         boolean addingOrders = true;
         int orderCounter = 1;
 
         // List For Order Summary Later
         List<String> orderSummaries = new ArrayList<>();
         while (addingOrders) {
+            System.out.println("+----------------------------------------------------+");
             System.out.println("| Select Service for Order #" + orderCounter + ":");
             System.out.println("+----------------------------------------------------+");
             System.out.println("| [1] Wash                                           |");
