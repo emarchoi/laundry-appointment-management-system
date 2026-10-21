@@ -1,8 +1,10 @@
 package com.laundry.util;
 
+import java.util.List;
+
+import com.laundry.machineclass.Machine;
 import com.laundry.systemclass.Appointment;
 import com.laundry.systemclass.MachineUsage;
-import com.laundry.machineclass.*;
 
 // Machine Usage
 public class MachineService {
