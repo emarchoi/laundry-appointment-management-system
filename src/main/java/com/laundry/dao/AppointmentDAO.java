@@ -46,8 +46,7 @@ public class AppointmentDAO {
         String q = "SELECT * FROM Appointment "
                 + "WHERE ReferenceNumber = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection(); 
-            PreparedStatement s = conn.prepareStatement(q)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement s = conn.prepareStatement(q)) {
 
             s.setString(1, referenceNumber);
 
@@ -89,38 +88,80 @@ public class AppointmentDAO {
         return appointments;
     }
 
-    
+    // 3. GET APPOINTMENT BY STATUS (Will mostly use in "Pending" Appointment)
+    public List<Appointment> getAppointmentByStatus(String status) {
+
+        List<Appointment> appointments = new ArrayList<>();
+
+        String q = "SELECT * FROM Appointment "
+                + "WHERE AppointmentStatus = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection(); 
+            PreparedStatement s = conn.prepareStatement(q)) {
+
+            s.setString(1, status);
+
+            try (ResultSet rs = s.executeQuery()) {
+
+                while (rs.next()) {
+
+                    int id = rs.getInt("AppointmentID");
+                    String refNum = rs.getString("ReferenceNumber");
+                    String type = rs.getString("AppointmentType");
+                    LocalDate date = rs.getDate("AppointmentDate").toLocalDate();
+
+                    Appointment appt = new Appointment(id, refNum, type, date);
+                    appt.setAppointmentStatus(rs.getString("AppointmentStatus"));
+
+                    int staffId = rs.getInt("StaffID");
+                    if (!rs.wasNull()) {
+                        appt.setStaffId(staffId);
+                    }
+
+                    int ecf = rs.getInt("EstimatedCompletionFinished");
+                    if (!rs.wasNull()) {
+                        appt.setECF(ecf);
+                    }
+
+                    appointments.add(appt);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println();
+        }
+        return appointments;
+    }
 
     // 4. FULL UPDATE (Used by Attendant/Rider to update Status, StaffID, Price, and ECF)
     public boolean updateAppointment(Appointment appointment) {
         String q = "UPDATE Appointment SET StaffID = ?, AppointmentStatus = ?, "
-                        + "AppointmentTotalPrice = ?, EstimatedCompletionFinished = ? "
-                        + "WHERE AppointmentID = ?";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement s = conn.prepareStatement(q)) {
-             
+                + "AppointmentTotalPrice = ?, EstimatedCompletionFinished = ? "
+                + "WHERE AppointmentID = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement s = conn.prepareStatement(q)) {
+
             // Safely set StaffID to NULL if unassigned
             if (appointment.getStaffId() == null) {
                 s.setNull(1, Types.INTEGER);
             } else {
                 s.setInt(1, appointment.getStaffId());
             }
-            
+
             s.setString(2, appointment.getAppointmentStatus());
             s.setDouble(3, appointment.getAppointmentTotalPrice());
-            
+
             // Safely set ECF to NULL if it is 0
             if (appointment.getECF() == 0) {
                 s.setNull(4, Types.INTEGER);
             } else {
                 s.setInt(4, appointment.getECF());
             }
-            
+
             s.setInt(5, appointment.getAppointmentId());
-            
+
             return s.executeUpdate() > 0;
-            
+
         } catch (SQLException e) {
             System.err.println("Database Error (Update Appointment): " + e.getMessage());
             return false;
