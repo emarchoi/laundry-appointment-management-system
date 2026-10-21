@@ -13,8 +13,8 @@ public class MainMenu {
         boolean isRunning = true;
 
         while (isRunning) {
-            System.out.println("+----------------------------------------------------+");
-            System.out.println("|       LAUNDRY APPOINTMENT SYSTEM                   |");
+            System.out.println("\n+----------------------------------------------------+");
+            System.out.println("|            LAUNDRY APPOINTMENT SYSTEM              |");
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [1] BOOK APPOINTMENT                              |");
             System.out.println("|  [2] STAFF LOG IN                                  |");
@@ -27,10 +27,11 @@ public class MainMenu {
 
             switch (choice) {
                 case "1":
-                    System.out.println("\n-> Redirecting to Booking Menu (To be implemented)...\n");
-                    // Future: new BookingMenu(scanner).display();
+                    System.out.println("\n-> Redirecting to Booking Menu...");
+                    new BookingMenu(scanner).display();
                     break;
                 case "2":
+                    System.out.println("\n-> Redirecting to Staff Login...");
                     StaffLoginMenu loginMenu = new StaffLoginMenu(scanner);
                     loginMenu.display();
                     break;
