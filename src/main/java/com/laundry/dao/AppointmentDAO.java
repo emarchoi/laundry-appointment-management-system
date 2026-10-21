@@ -89,7 +89,9 @@ public class AppointmentDAO {
         return appointments;
     }
 
-    // 3. FULL UPDATE (Used by Attendant/Rider to update Status, StaffID, Price, and ECF)
+    
+
+    // 4. FULL UPDATE (Used by Attendant/Rider to update Status, StaffID, Price, and ECF)
     public boolean updateAppointment(Appointment appointment) {
         String q = "UPDATE Appointment SET StaffID = ?, AppointmentStatus = ?, "
                         + "AppointmentTotalPrice = ?, EstimatedCompletionFinished = ? "

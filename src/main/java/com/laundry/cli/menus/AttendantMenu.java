@@ -17,7 +17,7 @@ public class AttendantMenu {
 
         while (inAttendantMenu) {
             System.out.println("\n+----------------------------------------------------+");
-            System.out.println(String.format("| %-50s |", "ATTENDANT MENU - Welcome, " + loggedInStaff.getFirstName()));
+            System.out.println(String.format("| %-50s |", "ATTENDANT MENU - Welcome, " + loggedInStaff.getFullName()));
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [1] VIEW APPOINTMENTS (Assign Machines)           |");
             System.out.println("|  [2] VIEW LAUNDRY MACHINES                         |");
