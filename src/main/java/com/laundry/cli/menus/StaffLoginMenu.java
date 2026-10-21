@@ -59,15 +59,21 @@ public class StaffLoginMenu {
                         
                         inLoginMenu = false; // Exit login loop after successful session ends
                     } else {
-                        System.out.println("\n| ERROR: Invalid Staff ID or Name. Please try again. |");
+                        System.out.println("\n+----------------------------------------------------+");
+                        System.out.println("| ERROR: Invalid Staff ID or Name. Please try again. |");
+                        System.out.println("+----------------------------------------------------+");
                     }
                 } catch (NumberFormatException e) {
-                    System.out.println("\n| ERROR: Staff ID must be a number.                  |");
+                    System.out.println("\n+----------------------------------------------------+");
+                    System.out.println("| ERROR: Staff ID must be a number.                  |");
+                    System.out.println("+----------------------------------------------------+");
                 }
             } else if (loginChoice.equals("0")) {
                 inLoginMenu = false; 
             } else {
+                System.out.println("\n+----------------------------------------------------+");
                 System.out.println("| Invalid option. Please try again.                  |");
+                System.out.println("+----------------------------------------------------+");
             }
         }
     }
