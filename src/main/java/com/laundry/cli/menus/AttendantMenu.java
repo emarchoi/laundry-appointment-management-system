@@ -49,6 +49,7 @@ public class AttendantMenu {
                 case "1":
                     viewPendingAppointments();
                     break;
+                // case "2": viewAllAppointments();
                 case "2":
                     viewLaundryMachines();
                     break;
