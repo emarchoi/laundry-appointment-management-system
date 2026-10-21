@@ -2,7 +2,7 @@ package com.laundry.cli.menus;
 
 import com.laundry.dao.StaffDAO;
 import com.laundry.userclass.Staff;
-import com.laundry.userclass.Attendant;
+import com.laundry.userclass.LaundryAttendant;
 import com.laundry.userclass.DeliveryRider;
 import java.util.Scanner;
 
@@ -49,7 +49,7 @@ public class StaffLoginMenu {
                         System.out.println("+----------------------------------------------------+");
                         
                         // Polymorphism: Route to the correct menu based on role
-                        if (loggedInStaff instanceof Attendant) {
+                        if (loggedInStaff instanceof LaundryAttendant) {
                             AttendantMenu attendantMenu = new AttendantMenu(scanner, loggedInStaff);
                             attendantMenu.display();
                         } else if (loggedInStaff instanceof DeliveryRider) {
