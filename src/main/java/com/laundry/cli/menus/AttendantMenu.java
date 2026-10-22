@@ -6,9 +6,11 @@ import java.util.Scanner;
 import com.laundry.dao.AppointmentDAO;
 import com.laundry.dao.LaundryOrderDAO;
 import com.laundry.dao.MachineDAO;
+import com.laundry.dao.MachineUsageDAO;
 import com.laundry.machineclass.Machine;
 import com.laundry.systemclass.Appointment;
 import com.laundry.systemclass.LaundryOrder;
+import com.laundry.systemclass.MachineUsage;
 import com.laundry.userclass.Staff;
 import com.laundry.util.AppointmentService;
 import com.laundry.util.MachineService;
@@ -21,6 +23,7 @@ public class AttendantMenu {
     private AppointmentDAO appointmentDAO = new AppointmentDAO();
     private LaundryOrderDAO orderDAO = new LaundryOrderDAO();
     private MachineDAO machineDAO = new MachineDAO();
+    private MachineUsageDAO machineUsageDAO = new MachineUsageDAO();
 
     private AppointmentService appointmentService = new AppointmentService();
     private MachineService machineService = new MachineService();
@@ -38,7 +41,8 @@ public class AttendantMenu {
             System.out.println(String.format("| %-50s |", "ATTENDANT MENU - Welcome, " + loggedInStaff.getFullName()));
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [1] VIEW PENDING APPOINTMENTS (Assign Machines)   |");
-            System.out.println("|  [2] VIEW LAUNDRY MACHINES                         |");
+            System.out.println("|  [2] VIEW ALL APPOINTMENTS                         |");
+            System.out.println("|  [3] VIEW LAUNDRY MACHINES                         |");
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [0] LOGOUT                                        |");
             System.out.println("+----------------------------------------------------+");
@@ -50,8 +54,10 @@ public class AttendantMenu {
                 case "1":
                     viewPendingAppointments();
                     break;
-                // case "2": viewAllAppointments();
-                case "2":
+                case "2": 
+                    viewAllAppointments();
+                    break;
+                case "3":
                     viewLaundryMachines();
                     break;
                 case "0":
@@ -158,6 +164,41 @@ public class AttendantMenu {
             System.out.println("\n+----------------------------------------------------+");
             System.out.println("| ERROR: Failed to update appointment status.       |");
             System.out.println("+----------------------------------------------------+");
+        }
+    }
+
+    private void viewAllAppointments() {
+        System.out.println("\n+-------------------------------------------------------------+");
+        System.out.println("|           MONITOR ALL APPOINTMENTS & SUMMARIES              |");
+        System.out.println("+-------------------------------------------------------------+");
+
+        List<Appointment> allAppts = appointmentDAO.getAllAppointments();
+
+        if (allAppts.isEmpty()) {
+            System.out.println("+-------------------------------------------------------------+");
+            System.out.println("| No appointments found in database.                          |");
+            System.out.println("+-------------------------------------------------------------+");
+            return;
+        }
+
+        for (Appointment appt : allAppts) {
+            System.out.println("+-------------------------------------------------------------+");
+            System.out.println(String.format("| Appt ID: %-6d | Ref: %-9s | Status: %-12s ", 
+                appt.getAppointmentId(), appt.getReferenceNumber(), appt.getAppointmentStatus()));
+            System.out.println(String.format("| Type: %-9s | ECF: %-9s | Price: PHP %-7.2f ", 
+                appt.getAppointmentType(), (appt.getECF() > 0 ? appt.getECF() + " mins" : "Pending"), appt.getAppointmentTotalPrice()));
+            
+            // Fetch and summary list of corresponding orders
+            List<LaundryOrder> orders = orderDAO.getOrdersByAppointment(appt.getAppointmentId());
+            System.out.println("+-------------------------------------------------------------+");
+            System.out.println("| Orders Summary:                                             |");
+            System.out.println("+-------------------------------------------------------------+");
+            for (int i = 0; i < orders.size(); i++) {
+                LaundryOrder o = orders.get(i);
+                System.out.println(String.format("| %-2d. Order #%-6d | %-12s | Weight: %-4.1fkg ", 
+                    (i + 1), o.getOrderId(), o.getLaundryService(), o.getLaundryTotalKg()));
+            }
+            System.out.println("+-------------------------------------------------------------+\n");
         }
     }
 
