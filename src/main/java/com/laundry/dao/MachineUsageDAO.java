@@ -1,5 +1,7 @@
-import com.laundry.config.DatabaseConnection;
+package com.laundry.dao;
+
 import com.laundry.systemclass.MachineUsage;
+import com.laundry.config.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
