@@ -163,7 +163,7 @@ public class AttendantMenu {
 
     private void viewLaundryMachines() {
         System.out.println("\n+----------------------------------------------------+");
-        System.out.println("|             2. VIEW LAUNDRY MACHINES               |");
+        System.out.println("|                VIEW LAUNDRY MACHINES               |");
         System.out.println("+----------------------------------------------------+");
         System.out.println("|  [1] View Washers                                  |");
         System.out.println("|  [2] View Dryers                                   |");
@@ -197,7 +197,7 @@ public class AttendantMenu {
         }
 
         for (Machine m : machines) {
-            System.out.println(String.format("| ID: %-5d | Type: %-8s | Status: %-16s |", 
+            System.out.println(String.format("| ID: %-5d | Type: %-8s | Status: %-13s |", 
                 m.getMachineId(), m.getMachineType(), m.getMachineStatus()));
         }
         System.out.println("+----------------------------------------------------+");
