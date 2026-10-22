@@ -180,7 +180,7 @@ public class BookingMenu {
             }
         }
 
-        // ADD ORDER SUMMARY
+        // ADD APPOINTMENT AND ORDER SUMMARY
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|         APPOINTMENT CREATED SUCCESSFULLY!          |");
         System.out.println("+----------------------------------------------------+");
@@ -203,6 +203,19 @@ public class BookingMenu {
         }
         
         System.out.println("+----------------------------------------------------+\n");
+
+        if (appointmentType.equalsIgnoreCase("Walk-In")) {
+            System.out.println("+----------------------------------------------------+");
+            System.out.println("| Please bring your laundry to the shop              |");
+            System.out.println("| at your convenience. Thank you!                    |");
+            System.out.println("+----------------------------------------------------+");
+        } else if (appointmentType.equalsIgnoreCase("Delivery")) {
+            System.out.println("+----------------------------------------------------+");
+            System.out.println("| Please wait while our delivery rider arrives       |");
+            System.out.println("| to collect your laundry. Thank you!                |");
+            System.out.println("+----------------------------------------------------+");
+        }
+        
     }
 
     // VIEW APPOINTMENT
