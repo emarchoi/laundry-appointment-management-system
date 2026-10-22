@@ -240,6 +240,7 @@ public class BookingMenu {
         System.out.println("+----------------------------------------------------+");
         System.out.println("| Reference Number : " + appt.getReferenceNumber());
         System.out.println("| Appointment ID   : " + appt.getAppointmentId());
+        System.out.println("| Date of Appointment   : " + appt.getAppointmentDate());
         System.out.println("| ");
         System.out.println("| Type             : " + appt.getAppointmentType());
         System.out.println("| Status           : " + appt.getAppointmentStatus());
