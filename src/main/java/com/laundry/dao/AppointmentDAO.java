@@ -16,7 +16,8 @@ public class AppointmentDAO {
                 + "AppointmentTotalPrice, AppointmentStatus, AppointmentDate, EstimatedCompletionFinished) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement s = conn.prepareStatement(q)) {
+        try (Connection conn = DatabaseConnection.getConnection(); 
+            PreparedStatement s = conn.prepareStatement(q)) {
 
             s.setInt(1, appointment.getAppointmentId());
             s.setString(2, appointment.getReferenceNumber());
@@ -46,7 +47,8 @@ public class AppointmentDAO {
         String q = "SELECT * FROM Appointment "
                 + "WHERE ReferenceNumber = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement s = conn.prepareStatement(q)) {
+        try (Connection conn = DatabaseConnection.getConnection(); 
+            PreparedStatement s = conn.prepareStatement(q)) {
 
             s.setString(1, referenceNumber);
 
@@ -164,6 +166,9 @@ public class AppointmentDAO {
                     appt.setECF(ecf);
                 }
 
+                double totalPrice = rs.getDouble("AppointmentTotalPrice");
+                appt.setAppointmentTotalPrice(totalPrice);  
+
                 appointments.add(appt);
             }
 
@@ -179,7 +184,8 @@ public class AppointmentDAO {
                 + "AppointmentTotalPrice = ?, EstimatedCompletionFinished = ? "
                 + "WHERE AppointmentID = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement s = conn.prepareStatement(q)) {
+        try (Connection conn = DatabaseConnection.getConnection(); 
+            PreparedStatement s = conn.prepareStatement(q)) {
 
             // Safely set StaffID to NULL if unassigned
             if (appointment.getStaffId() == null) {
