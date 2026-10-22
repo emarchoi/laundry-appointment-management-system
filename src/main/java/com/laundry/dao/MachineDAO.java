@@ -88,7 +88,7 @@ public class MachineDAO {
     }
 
     // GET MACHINES WITH USAGE DETAILS FILTERED BY TYPE ("Washer" or "Dryer")
-    public List<MachineUsageDetail> getMachinesWithUsageDetailsByType(String machineType) {
+    public List<MachineUsageDetail> getMachineAssignmentDetails(String machineType) {
         List<MachineUsageDetail> machUsageDet = new ArrayList<>();
         String q = "SELECT m.MachineID, m.MachineType, m.MachineStatus, " +
                        "mu.LaundryLoadKg, mu.OrderID, mu.LaundryDuration " +
