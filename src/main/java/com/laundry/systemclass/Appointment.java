@@ -86,6 +86,10 @@ public class Appointment {
         this.appointmentDate = appointmentDate;
     }
 
+    public void setAppointmentTotalPrice(double totalPrice) {
+        this.appointmentTotalPrice = totalPrice;
+    }
+
     public void setECF(int time) {
         this.estimatedCompletionFinished = time;
     }
