@@ -1,18 +1,15 @@
 package com.laundry.cli.menus;
 
+import java.util.List;
+import java.util.Scanner;
+
 import com.laundry.dao.AppointmentDAO;
 import com.laundry.dao.LaundryOrderDAO;
-
-import com.laundry.util.AppointmentService;
-import com.laundry.util.MachineService;
-
 import com.laundry.systemclass.Appointment;
 import com.laundry.systemclass.LaundryOrder;
-
 import com.laundry.userclass.Staff;
-
-import java.util.Scanner;
-import java.util.List;
+import com.laundry.util.AppointmentService;
+import com.laundry.util.MachineService;
 
 public class AttendantMenu {
 
@@ -36,7 +33,7 @@ public class AttendantMenu {
             System.out.println("\n+----------------------------------------------------+");
             System.out.println(String.format("| %-50s |", "ATTENDANT MENU - Welcome, " + loggedInStaff.getFullName()));
             System.out.println("+----------------------------------------------------+");
-            System.out.println("|  [1] VIEW APPOINTMENTS (Assign Machines)           |");
+            System.out.println("|  [1] VIEW PENDING APPOINTMENTS (Assign Machines)   |");
             System.out.println("|  [2] VIEW LAUNDRY MACHINES                         |");
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [0] LOGOUT                                        |");
