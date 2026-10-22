@@ -8,6 +8,32 @@ import java.util.*;
 
 public class MachineDAO {
 
+    // Helper Class for Machine Details with Usage
+    public static class MachineUsageDetail {
+        private int machineId;
+        private String machineType;
+        private double laundryLoad;
+        private String assignedTo;
+        private String machineStatus;
+        private int duration;
+
+        public MachineUsageDetail(int machineId, String machineType, double laundryLoad, String assignedTo, String machineStatus, int duration) {
+            this.machineId = machineId;
+            this.machineType = machineType;
+            this.laundryLoad = laundryLoad;
+            this.assignedTo = assignedTo;
+            this.machineStatus = machineStatus;
+            this.duration = duration;
+        }
+
+        public int getMachineId() { return machineId; }
+        public String getMachineType() { return machineType; }
+        public double getLaundryLoad() { return laundryLoad; }
+        public String getAssignedTo() { return assignedTo; }
+        public String getMachineStatus() { return machineStatus; }
+        public int getDuration() { return duration; }
+    }
+
     // 1. GET ALL MACHINES (Enter Machine Type: Washer / Dryer)
     public List<Machine> getMachinesByType(String machineType) {
 
@@ -60,4 +86,45 @@ public class MachineDAO {
             return false;
         }
     }
+
+    // GET MACHINES WITH USAGE DETAILS FILTERED BY TYPE ("Washer" or "Dryer")
+    public List<MachineUsageDetail> getMachinesWithUsageDetailsByType(String machineType) {
+        List<MachineUsageDetail> machUsageDet = new ArrayList<>();
+        String q = "SELECT m.MachineID, m.MachineType, m.MachineStatus, " +
+                       "mu.LaundryLoadKg, mu.OrderID, mu.LaundryDuration " +
+                       "FROM Machine m " +
+                       "LEFT JOIN MachineUsage mu ON m.MachineID = mu.MachineID " +
+                       "WHERE m.MachineType = ? " +
+                       "ORDER BY m.MachineID ASC";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement s = conn.prepareStatement(q)) {
+             
+            s.setString(1, machineType);
+            
+            try (ResultSet rs = s.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("MachineID");
+                    String type = rs.getString("MachineType");
+                    String status = rs.getString("MachineStatus");
+                    
+                    double load = rs.getDouble("LaundryLoadKg");
+                    if (rs.wasNull()) load = 0.0;
+                    
+                    int orderId = rs.getInt("OrderID");
+                    String assignedTo = (rs.wasNull() || orderId == 0) ? "None" : "Order #" + orderId;
+                    
+                    int duration = rs.getInt("LaundryDuration");
+                    if (rs.wasNull()) duration = 0;
+                    
+                    machUsageDet.add(new MachineUsageDetail(id, type, load, assignedTo, status, duration));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Error (Get Machine Details): " + e.getMessage());
+        }
+        return machUsageDet;
+    }
 }
+
+
