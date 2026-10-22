@@ -38,7 +38,7 @@ public class MainMenu {
                 case "0":
                     System.out.println("\n+----------------------------------------------------+");
             System.out.println("| Thank you for using our laundry service!           |");
-            System.out.println("+----------------------------------------------------+");
+            System.out.println("+----------------------------------------------------+\n");
                     isRunning = false;
                     break;
                 default:
