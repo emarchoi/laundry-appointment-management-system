@@ -5,6 +5,8 @@ import java.util.Scanner;
 
 import com.laundry.dao.AppointmentDAO;
 import com.laundry.dao.LaundryOrderDAO;
+import com.laundry.dao.MachineDAO;
+import com.laundry.machineclass.Machine;
 import com.laundry.systemclass.Appointment;
 import com.laundry.systemclass.LaundryOrder;
 import com.laundry.userclass.Staff;
@@ -18,6 +20,8 @@ public class AttendantMenu {
 
     private AppointmentDAO appointmentDAO = new AppointmentDAO();
     private LaundryOrderDAO orderDAO = new LaundryOrderDAO();
+    private MachineDAO machineDAO = new MachineDAO();
+
     private AppointmentService appointmentService = new AppointmentService();
     private MachineService machineService = new MachineService();
 
@@ -158,7 +162,87 @@ public class AttendantMenu {
     }
 
     private void viewLaundryMachines() {
-        System.out.println("\n-> Entering View Machines Flow (To be implemented)...");
-        // We will fetch all Washers and Dryers from MachineDAO here later
+        System.out.println("\n+----------------------------------------------------+");
+        System.out.println("|             2. VIEW LAUNDRY MACHINES               |");
+        System.out.println("+----------------------------------------------------+");
+        System.out.println("|  [1] View Washers                                  |");
+        System.out.println("|  [2] View Dryers                                   |");
+        System.out.println("+----------------------------------------------------+");
+        System.out.println("|  [0] Back to Attendant Menu                        |");
+        System.out.println("+----------------------------------------------------+");
+        System.out.print("SELECT OPTION: ");
+
+        String choice = scanner.nextLine();
+        String machineType;
+
+        if (choice.equals("1")) {
+            machineType = "Washer";
+        } else if (choice.equals("2")) {
+            machineType = "Dryer";
+        } else {
+            return;
+        }
+
+        List<Machine> machines = machineDAO.getMachinesByType(machineType);
+
+        System.out.println("\n+----------------------------------------------------+");
+        System.out.println(String.format("| %-50s |", machineType.toUpperCase() + " STATUS LIST"));
+        System.out.println("+----------------------------------------------------+");
+
+        if (machines.isEmpty()) {
+            System.out.println("\n+----------------------------------------------------+");
+            System.out.println("| No machines found.                                 |");
+            System.out.println("+----------------------------------------------------+");
+            return;
+        }
+
+        for (Machine m : machines) {
+            System.out.println(String.format("| ID: %-5d | Type: %-8s | Status: %-16s |", 
+                m.getMachineId(), m.getMachineType(), m.getMachineStatus()));
+        }
+        System.out.println("+----------------------------------------------------+");
+        System.out.print("Enter Machine ID to Update Status (or 0 to exit): ");
+        
+        int machineId;
+        try {
+            machineId = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            return;
+        }
+
+        if (machineId == 0) return;
+
+        System.out.println("\n+----------------------------------------------------+");
+        System.out.println("|                SELECT NEW STATUS                   |");
+        System.out.println("+----------------------------------------------------+");
+        System.out.println("|  [1] Available                                     |");
+        System.out.println("|  [2] In Use                                        |");
+        System.out.println("|  [3] Under Maintenance                             |");
+        System.out.println("+----------------------------------------------------+");
+        System.out.print("SELECT OPTION: ");
+        
+        String statusChoice = scanner.nextLine();
+        String newStatus;
+
+        switch (statusChoice) {
+            case "1": newStatus = "Available"; break;
+            case "2": newStatus = "In Use"; break;
+            case "3": newStatus = "Under Maintenance"; break;
+            default:
+                System.out.println("\n+----------------------------------------------------+");
+                System.out.println("| Invalid selection. Returning to menu.              |");
+                System.out.println("+----------------------------------------------------+");
+                return;
+        }
+
+        if (machineDAO.updateMachineStatus(machineId, newStatus)) {
+            System.out.println("\n+----------------------------------------------------+");
+            System.out.println(String.format("| -> Machine #%-3d status updated to %-15s |", machineId, newStatus));
+            System.out.println("+----------------------------------------------------+");
+        } else {
+            System.out.println("\n+----------------------------------------------------+");
+            System.out.println("| ERROR: Failed to update machine status in DB.      |");
+            System.out.println("+----------------------------------------------------+");
+        }
     }
 }
