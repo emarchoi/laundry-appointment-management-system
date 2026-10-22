@@ -66,6 +66,33 @@ public class MachineDAO {
         return machines;
     }
 
+    // GET SINGLE MACHINE BY ID
+    public Machine getMachineById(int machineId) {
+        String query = "SELECT * FROM Machine WHERE MachineID = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+             
+            stmt.setInt(1, machineId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String type = rs.getString("MachineType");
+                    String status = rs.getString("MachineStatus");
+                    
+                    if ("Washer".equalsIgnoreCase(type)) {
+                        return new Washer(machineId, status);
+                    } else if ("Dryer".equalsIgnoreCase(type)) {
+                        return new Dryer(machineId, status);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Error (Get Machine By ID): " + e.getMessage());
+        }
+        return null;
+    }
+
     // 2. UPDATE MACHINE STATUS (Available -> In Use)
     public boolean updateMachineStatus(int machineId, String newStatus) {
 
@@ -87,7 +114,7 @@ public class MachineDAO {
         }
     }
 
-    // GET MACHINES WITH USAGE DETAILS FILTERED BY TYPE ("Washer" or "Dryer")
+    // 3. GET MACHINES WITH USAGE DETAILS FILTERED BY TYPE ("Washer" or "Dryer")
     public List<MachineUsageDetail> getMachineAssignmentDetails(String machineType) {
         List<MachineUsageDetail> machUsageDet = new ArrayList<>();
         String q = "SELECT m.MachineID, m.MachineType, m.MachineStatus, " +
