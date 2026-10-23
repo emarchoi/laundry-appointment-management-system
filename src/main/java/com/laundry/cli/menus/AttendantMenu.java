@@ -456,15 +456,15 @@ public class AttendantMenu {
         if ("1".equals(payChoice)) {
             paymentMethod = "Cash";
             boolean validAmount = false;
-            double amountTendered = 0.0;
+            double amountPd = 0.0;
 
             while (!validAmount) {
                 System.out.print("| Enter Amount Paid: ");
                 String input = scanner.nextLine().trim();
 
                 try {
-                    amountTendered = Double.parseDouble(input);
-                    if (amountTendered < totalAmount) {
+                    amountPd = Double.parseDouble(input);
+                    if (amountPd < totalAmount) {
                         System.out.println("\n+----------------------------------------------------+");
                         System.out.println("| ERROR: Amount paid is less than total due.         |");
                         System.out.println("+----------------------------------------------------+");
@@ -478,9 +478,9 @@ public class AttendantMenu {
                 }
             }
 
-            double change = amountTendered - totalAmount;
+            double change = amountPd - totalAmount;
             payment = new Cash(paymentId, appt.getAppointmentId(), totalAmount);
-            payment.setAmountPaid(amountTendered);
+            payment.setAmountPaid(amountPd);
             payment.markPaid();
 
             if (paymentDAO.createPayment(payment, paymentMethod)) {
@@ -488,7 +488,7 @@ public class AttendantMenu {
                 System.out.println("|             PAYMENT RECORDED SUCCESSFULLY          |");
                 System.out.println("+----------------------------------------------------+");
                 System.out.println(String.format("| Amount Due      : PHP %-28.2f |", totalAmount));
-                System.out.println(String.format("| Amount Paid     : PHP %-28.2f |", amountTendered));
+                System.out.println(String.format("| Amount Paid     : PHP %-28.2f |", amountPd));
                 System.out.println(String.format("| Change          : PHP %-28.2f |", change));
                 System.out.println("+----------------------------------------------------+");
             } else {
