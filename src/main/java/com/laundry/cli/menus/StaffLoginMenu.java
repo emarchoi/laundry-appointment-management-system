@@ -45,7 +45,7 @@ public class StaffLoginMenu {
 
                     if (loggedInStaff != null) {
                         System.out.println("\n+----------------------------------------------------+");
-                        System.out.println("| SUCCESS: Logged in as " + loggedInStaff.getStaffType() + String.format("%-12s |", ""));
+                        System.out.println("| SUCCESS: Logged in as " + loggedInStaff.getStaffType());
                         System.out.println("+----------------------------------------------------+");
                         
                         // Polymorphism: Route to the correct menu based on role

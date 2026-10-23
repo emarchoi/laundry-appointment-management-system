@@ -265,7 +265,9 @@ public class BookingMenu {
 
             if (payChoice.equals("1")) {
                 System.out.println("\n" + paymentService.generateDigitalPaymentQR(appt));
+                System.out.println("+----------------------------------------------------+");
                 System.out.println("-> Please show this QR code to the attendant.");
+                System.out.println("+----------------------------------------------------+");
             }
         }
     }

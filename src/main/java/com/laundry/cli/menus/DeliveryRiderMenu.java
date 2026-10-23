@@ -35,7 +35,7 @@ public class DeliveryRiderMenu {
 
         while (inRiderMenu) {
             System.out.println("\n+----------------------------------------------------+");
-            System.out.println(String.format("| %-50s |", "DELIVERY RIDER MENU - Welcome, " + loggedInRider.getFirstName()));
+            System.out.println(String.format("| %-50s |", "DELIVERY RIDER MENU - Welcome, " + loggedInRider.getFullName()));
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [1] VIEW DELIVERY APPOINTMENTS                    |");
             System.out.println("|  [2] UPDATE DELIVERY STATUS                        |");
@@ -72,9 +72,9 @@ public class DeliveryRiderMenu {
     }
 
     private void viewDeliveryAppointments() {
-        System.out.println("\n+----------------------------------------------------+");
-        System.out.println("|             DELIVERY APPOINTMENTS LIST             |");
-        System.out.println("+----------------------------------------------------+");
+        System.out.println("\n+---------------------------------------------------------+");
+        System.out.println("|                DELIVERY APPOINTMENTS LIST               |");
+        System.out.println("+---------------------------------------------------------+");
 
         List<Appointment> deliveryList = appointmentDAO.getDeliveryAppointment();
 
@@ -86,10 +86,10 @@ public class DeliveryRiderMenu {
         }
 
         for (Appointment appt : deliveryList) {
-            System.out.println(String.format("| ID: %-6d | Ref: %-10s | Status: %-13s |", 
+            System.out.println(String.format("| ID: %-6d | Ref: %-10s | Status: %-13s ", 
                 appt.getAppointmentId(), appt.getReferenceNumber(), appt.getAppointmentStatus()));
         }
-        System.out.println("+----------------------------------------------------+");
+        System.out.println("+---------------------------------------------------------+");
     }
 
     private void updateDeliveryStatus() {
@@ -135,7 +135,7 @@ public class DeliveryRiderMenu {
 
         if (appointmentDAO.updateAppointment(appt)) {
             System.out.println("\n+----------------------------------------------------+");
-            System.out.println(String.format("| -> Status updated to '%-28s' |", newStatus));
+            System.out.println(String.format("| -> Status updated to '%s'", newStatus));
             System.out.println("+----------------------------------------------------+");
         } else {
             System.out.println("\n+----------------------------------------------------+");
