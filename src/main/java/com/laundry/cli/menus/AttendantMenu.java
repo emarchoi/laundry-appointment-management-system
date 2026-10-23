@@ -281,9 +281,9 @@ public class AttendantMenu {
 
         for (Appointment appt : allAppts) {
             System.out.println("+-------------------------------------------------------------+");
-            System.out.println(String.format("| Appt ID: %-6d | Ref: %-9s | Status: %-12s ", 
+            System.out.println(String.format("| Appt ID: %-6d | Type: %-9s | ECF: %-12s ", 
                 appt.getAppointmentId(), appt.getReferenceNumber(), appt.getAppointmentStatus()));
-            System.out.println(String.format("| Type: %-9s | ECF: %-9s | Price: PHP %-7.2f ", 
+            System.out.println(String.format("| Ref: %-9s | Status: %-9s | Price: PHP %-7.2f ", 
                 appt.getAppointmentType(), (appt.getECF() > 0 ? appt.getECF() + " mins" : "Pending"), appt.getAppointmentTotalPrice()));
             
             // Fetch and summary list of corresponding orders
