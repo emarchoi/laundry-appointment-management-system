@@ -242,18 +242,18 @@ public class BookingMenu {
         System.out.println("| Appointment ID     : " + appt.getAppointmentId());
         System.out.println("| Appointment Date   : " + appt.getAppointmentDate());
         System.out.println("| ");
-        System.out.println("| Type             : " + appt.getAppointmentType());
-        System.out.println("| Status           : " + appt.getAppointmentStatus());
+        System.out.println("| Type               : " + appt.getAppointmentType());
+        System.out.println("| Status             : " + appt.getAppointmentStatus());
 
         if (appt.getECF() > 0) {
-            System.out.println("| Est. Duration    : " + appt.getECF() + " minutes");
+            System.out.println("| Est. Duration      : " + appt.getECF() + " minutes");
         } else {
-            System.out.println("| Est. Duration    : Pending Assignment");
+            System.out.println("| Est. Duration      : Pending Assignment");
         }
 
         System.out.println("| ");
-        System.out.println("| Total Price      : PHP " + appt.getAppointmentTotalPrice());
-        System.out.println("| Payment Status   : " + (appt.isPaid() ? "" : "Pending"));
+        System.out.println("| Total Price        : PHP " + appt.getAppointmentTotalPrice());
+        System.out.println("| Payment Status     : " + (appt.isPaid() ? "" : "Pending"));
         System.out.println("+----------------------------------------------------+");
 
         if (!appt.isPaid() && appt.getAppointmentTotalPrice() > 0) {
