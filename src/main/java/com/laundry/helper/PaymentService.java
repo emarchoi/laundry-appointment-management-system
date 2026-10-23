@@ -1,4 +1,4 @@
-package com.laundry.util;
+package com.laundry.helper;
 
 import com.laundry.systemclass.Appointment;
 import com.laundry.systemclass.Payment;

@@ -9,11 +9,11 @@ import java.util.Scanner;
 import com.laundry.dao.AppointmentDAO;
 import com.laundry.dao.CustomerDAO;
 import com.laundry.dao.LaundryOrderDAO;
+import com.laundry.helper.AppointmentService;
+import com.laundry.helper.PaymentService;
 import com.laundry.systemclass.Appointment;
 import com.laundry.systemclass.LaundryOrder;
 import com.laundry.userclass.Customer;
-import com.laundry.util.AppointmentService;
-import com.laundry.util.PaymentService;
 
 public class BookingMenu {
     private Scanner scanner;

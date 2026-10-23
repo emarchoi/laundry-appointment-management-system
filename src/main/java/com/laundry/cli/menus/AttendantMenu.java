@@ -9,13 +9,13 @@ import com.laundry.dao.AppointmentDAO;
 import com.laundry.dao.LaundryOrderDAO;
 import com.laundry.dao.MachineDAO;
 import com.laundry.dao.MachineUsageDAO;
+import com.laundry.helper.AppointmentService;
+import com.laundry.helper.MachineService;
 import com.laundry.machineclass.Machine;
 import com.laundry.systemclass.Appointment;
 import com.laundry.systemclass.LaundryOrder;
 import com.laundry.systemclass.MachineUsage;
 import com.laundry.userclass.Staff;
-import com.laundry.util.AppointmentService;
-import com.laundry.util.MachineService;
 
 public class AttendantMenu {
 
@@ -386,7 +386,7 @@ public class AttendantMenu {
 
         if (machineDAO.updateMachineStatus(machineId, newStatus)) {
             System.out.println("\n+----------------------------------------------------+");
-            System.out.println(String.format("| -> Machine #%-3d status updated to %-15s |", machineId, newStatus));
+            System.out.println(String.format("| -> Machine #%-2d status updated to %-15s |", machineId, newStatus));
             System.out.println("+----------------------------------------------------+");
         } else {
             System.out.println("\n+----------------------------------------------------+");

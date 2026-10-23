@@ -1,4 +1,4 @@
-package com.laundry.util;
+package com.laundry.helper;
 
 import com.laundry.dao.CustomerDAO;
 import com.laundry.userclass.Customer;
