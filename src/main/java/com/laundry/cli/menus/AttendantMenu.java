@@ -172,6 +172,7 @@ public class AttendantMenu {
                 }
 
                 if (availableMachines.isEmpty()) {
+                    System.out.println("\n+----------------------------------------------------+");
                     System.out.println("| ERROR: No available " + mType + "s in database!       |");
                     System.out.println("+----------------------------------------------------+");
                     return;
@@ -202,7 +203,7 @@ public class AttendantMenu {
 
                         if (selectedMachine == null) {
                             System.out.println("\n+----------------------------------------------------+");
-                            System.out.println("| ERROR: Machine ID #" + chosenMachineId + " does not exist.              |");
+                            System.out.println("| ERROR: Machine #" + chosenMachineId + " does not exist.                 |");
                             System.out.println("+----------------------------------------------------+\n");
                         } else if (!selectedMachine.getMachineType().equalsIgnoreCase(mType)) {
                             System.out.println("\n+----------------------------------------------------+");
@@ -328,7 +329,7 @@ public class AttendantMenu {
         System.out.println(String.format("| %-81s |", machineType.toUpperCase() + " STATUS LIST"));
         System.out.println("+-----------------------------------------------------------------------------------+");
         System.out.println(String.format("| %-10s | %-12s | %-15s | %-20s | %-12s |", 
-            "Machine ID", "LaundryLoad", "AssignedTo", "Status", "Duration"));
+            "Machine ID", "Laundry Load", "Assigned To", "Status", "Duration"));
         System.out.println("+-----------------------------------------------------------------------------------+");
 
         if (machines.isEmpty()) {
