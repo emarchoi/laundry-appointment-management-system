@@ -23,10 +23,10 @@ public class StaffLoginMenu {
             System.out.println("+----------------------------------------------------+");
             
             System.out.print("| Enter Staff ID: ");
-            String staffIdInput = scanner.nextLine();
+            String staffIdInput = scanner.nextLine().trim();
             
             System.out.print("| Enter Full Name: ");
-            String fullName = scanner.nextLine();
+            String fullName = scanner.nextLine().trim();
             
             System.out.println("+----------------------------------------------------+");
             System.out.println("| [1] LOGIN                                          |");
@@ -34,7 +34,7 @@ public class StaffLoginMenu {
             System.out.println("+----------------------------------------------------+");
             System.out.print("SELECT OPTION: ");
             
-            String loginChoice = scanner.nextLine();
+            String loginChoice = scanner.nextLine().trim();
 
             if (loginChoice.equals("1")) {
                 try {

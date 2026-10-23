@@ -74,6 +74,7 @@ public class AttendantMenu {
                     break;
                 case "4":
                     processPayment();
+                    break;
                 case "0":
                     System.out.println("\n+----------------------------------------------------+");
                     System.out.println("|  Logging out... Returning to Main Menu.            |");
@@ -265,7 +266,7 @@ public class AttendantMenu {
         selectedAppt.setECF(selectedAppt.getOrders().size() * 60); // 60 mins per cycle
 
         if (appointmentDAO.updateAppointment(selectedAppt)) {
-            System.out.println("\n+----------------------------------------------------+");
+            System.out.println("+----------------------------------------------------+");
             System.out.println("| APPOINTMENT PROCESSED AND SET TO 'IN PROGRESS'!    |");
             System.out.println("+----------------------------------------------------+");
             System.out.println(String.format("| Final Total Price : PHP %-26.2f |", selectedAppt.getAppointmentTotalPrice()));
@@ -410,7 +411,7 @@ public class AttendantMenu {
 
     private void processPayment() {
         System.out.println("\n+----------------------------------------------------+");
-        System.out.println("|                  PROCESS  PAYMENT                  |");
+        System.out.println("|                   PROCESS PAYMENT                  |");
         System.out.println("+----------------------------------------------------+");
         System.out.print("| Enter Reference Number: ");
         String refNum = scanner.nextLine().trim();
@@ -432,92 +433,105 @@ public class AttendantMenu {
         }
 
         double totalAmount = appt.getAppointmentTotalPrice();
-
         if (totalAmount <= 0) {
             System.out.println("\n+----------------------------------------------------+");
             System.out.println("| ERROR: Total price is PHP 0.00. Weigh order first.  |");
             System.out.println("+----------------------------------------------------+");
             return;
         }
-
+        System.out.println("+----------------------------------------------------+");
         System.out.println(String.format("| Total Amount Due: PHP %-28.2f |", totalAmount));
         System.out.println("+----------------------------------------------------+");
-        System.out.println("| Select Payment Method:                             |");
-        System.out.println("|  [1] Cash                                          |");
-        System.out.println("|  [2] E-Payment (Digital)                           |");
-        System.out.println("+----------------------------------------------------+");
-        System.out.print("SELECT OPTION: ");
-        String payChoice = scanner.nextLine().trim();
+        
+        boolean validSelection = false;
 
-        String paymentMethod;
-        Payment payment;
-        int paymentId = new Random().nextInt(900000) + 100000;
+        // Validation loop keeps attendant in payment selection on invalid input
+        while (!validSelection) {
+            System.out.println("\n+----------------------------------------------------+");
+            System.out.println("| Select Payment Method:                             |");
+            System.out.println("+----------------------------------------------------+");
+            System.out.println("|  [1] Cash                                          |");
+            System.out.println("|  [2] E-Payment (Digital)                           |");
+            System.out.println("+----------------------------------------------------+");
+            System.out.println("|  [0] Cancel / Back to Attendant Menu               |");
+            System.out.println("+----------------------------------------------------+");
+            System.out.print("SELECT OPTION: ");
+            String payChoice = scanner.nextLine().trim();
 
-        if ("1".equals(payChoice)) {
-            paymentMethod = "Cash";
-            boolean validAmount = false;
-            double amountPd = 0.0;
+            int paymentId = new Random().nextInt(900000) + 100000;
 
-            while (!validAmount) {
-                System.out.print("| Enter Amount Paid: ");
-                String input = scanner.nextLine().trim();
+            if ("1".equals(payChoice)) {
+                validSelection = true;
+                boolean validAmount = false;
+                double amountTendered = 0.0;
 
-                try {
-                    amountPd = Double.parseDouble(input);
-                    if (amountPd < totalAmount) {
-                        System.out.println("\n+----------------------------------------------------+");
-                        System.out.println("| ERROR: Amount paid is less than total due.         |");
-                        System.out.println("+----------------------------------------------------+");
-                    } else {
-                        validAmount = true;
-                    }
-                } catch (NumberFormatException e) {
+                while (!validAmount) {
                     System.out.println("\n+----------------------------------------------------+");
-                    System.out.println("| ERROR: Enter a valid numeric amount.              |");
+                    System.out.print("| Enter Amount Paid: ");
+                    String input = scanner.nextLine().trim();
+
+                    try {
+                        amountTendered = Double.parseDouble(input);
+                        if (amountTendered < totalAmount) {
+                            System.out.println("\n+-----------------------------------------------+");
+                            System.out.println("| ERROR: Amount paid is less than total due.    |");
+                            System.out.println("+-----------------------------------------------+");
+                        } else {
+                            validAmount = true;
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("\n+-----------------------------------------------+");
+                        System.out.println("| ERROR: Enter a valid numeric amount.          |");
+                        System.out.println("+-----------------------------------------------+");
+                    }
+                }
+
+                double change = amountTendered - totalAmount;
+                Payment payment = new Cash(paymentId, appt.getAppointmentId(), totalAmount);
+                payment.setAmountPaid(amountTendered);
+                payment.markPaid();
+
+                if (paymentDAO.createPayment(payment, "Cash")) {
+                    System.out.println("\n+----------------------------------------------------+");
+                    System.out.println("|             PAYMENT RECORDED SUCCESSFULLY          |");
+                    System.out.println("+----------------------------------------------------+");
+                    System.out.println(String.format("| Amount Due      : PHP %-28.2f |", totalAmount));
+                    System.out.println(String.format("| Amount Paid     : PHP %-28.2f |", amountTendered));
+                    System.out.println(String.format("| Change          : PHP %-28.2f |", change));
+                    System.out.println("+----------------------------------------------------+");
+                } else {
+                    System.out.println("\n+----------------------------------------------------+");
+                    System.out.println("| ERROR: Could not record payment in database.       |");
                     System.out.println("+----------------------------------------------------+");
                 }
-            }
 
-            double change = amountPd - totalAmount;
-            payment = new Cash(paymentId, appt.getAppointmentId(), totalAmount);
-            payment.setAmountPaid(amountPd);
-            payment.markPaid();
+            } else if ("2".equals(payChoice)) {
+                validSelection = true;
+                Payment payment = new DigitalPayment(paymentId, appt.getAppointmentId(), totalAmount);
+                payment.setAmountPaid(totalAmount);
+                payment.markPaid();
 
-            if (paymentDAO.createPayment(payment, paymentMethod)) {
+                if (paymentDAO.createPayment(payment, "E-Payment")) {
+                    System.out.println("\n+----------------------------------------------------+");
+                    System.out.println("|          E-PAYMENT CONFIRMED SUCCESSFULLY!         |");
+                    System.out.println("+----------------------------------------------------+");
+                    System.out.println(String.format("| Total Paid      : PHP %-28.2f |", totalAmount));
+                    System.out.println("+----------------------------------------------------+");
+                } else {
+                    System.out.println("| ERROR: Could not record payment in database.       |");
+                    System.out.println("+----------------------------------------------------+");
+                }
+
+            } else if ("0".equals(payChoice)) {
+                validSelection = true;
                 System.out.println("\n+----------------------------------------------------+");
-                System.out.println("|             PAYMENT RECORDED SUCCESSFULLY          |");
-                System.out.println("+----------------------------------------------------+");
-                System.out.println(String.format("| Amount Due      : PHP %-28.2f |", totalAmount));
-                System.out.println(String.format("| Amount Paid     : PHP %-28.2f |", amountPd));
-                System.out.println(String.format("| Change          : PHP %-28.2f |", change));
+                System.out.println("| Payment selection cancelled. Returning to menu.    |");
                 System.out.println("+----------------------------------------------------+");
             } else {
-                System.out.println("\n+----------------------------------------------------+");
-                System.out.println("| ERROR: Could not record payment in database.       |");
+                System.out.println("+----------------------------------------------------+");
+                System.out.println("| Invalid payment method selected. Please try again. |");
                 System.out.println("+----------------------------------------------------+");
             }
-
-        } else if ("2".equals(payChoice)) {
-            paymentMethod = "E-Payment";
-            payment = new DigitalPayment(paymentId, appt.getAppointmentId(), totalAmount);
-            payment.setAmountPaid(totalAmount);
-            payment.markPaid();
-
-            if (paymentDAO.createPayment(payment, paymentMethod)) {
-                System.out.println("\n+----------------------------------------------------+");
-                System.out.println("|          E-PAYMENT CONFIRMED SUCCESSFULLY!         |");
-                System.out.println("+----------------------------------------------------+");
-                System.out.println(String.format("| Total Paid      : PHP %-28.2f |", totalAmount));
-                System.out.println("+----------------------------------------------------+");
-            } else {
-                System.out.println("\n+----------------------------------------------------+");
-                System.out.println("| ERROR: Could not record payment in database.       |");
-                System.out.println("+----------------------------------------------------+");
-            }
-        } else {
-            System.out.println("\n+----------------------------------------------------+");
-            System.out.println("| Invalid payment method selected.                   |");
-            System.out.println("+----------------------------------------------------+");
         }
     }
 }

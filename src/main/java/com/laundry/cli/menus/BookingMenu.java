@@ -226,7 +226,7 @@ public class BookingMenu {
         System.out.print("| Enter Reference Number: ");
         String refNum = scanner.nextLine();
 
-        Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
+        Appointment appt = appointmentService.getFullAppointmentDetails(refNum.toUpperCase());
         
         if (appt == null) {
             System.out.println("+----------------------------------------------------+");
