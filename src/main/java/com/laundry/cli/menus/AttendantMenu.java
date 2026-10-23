@@ -266,37 +266,37 @@ public class AttendantMenu {
     }
 
     private void viewAllAppointments() {
-        System.out.println("\n+-------------------------------------------------------------+");
-        System.out.println("|                   VIEW ALL APPOINTMENTS                     |");
-        System.out.println("+-------------------------------------------------------------+");
+        System.out.println("\n+---------------------------------------------------------------+");
+        System.out.println("|                     VIEW ALL APPOINTMENTS                     |");
+        System.out.println("+---------------------------------------------------------------+");
 
         List<Appointment> allAppts = appointmentDAO.getAllAppointments();
 
         if (allAppts.isEmpty()) {
-            System.out.println("+-------------------------------------------------------------+");
+            System.out.println("\n+---------------------------------------------------------------+");
             System.out.println("| No appointments found in database.                          |");
-            System.out.println("+-------------------------------------------------------------+");
-            return;
+            System.out.println("+---------------------------------------------------------------+");
         }
 
         for (Appointment appt : allAppts) {
-            System.out.println("+-------------------------------------------------------------+");
-            System.out.println(String.format("| Appt ID: %-6d | Type: %-9s | ECF: %-12s ", 
+            System.out.println("+---------------------------------------------------------------+");
+            System.out.println(String.format("| Appt ID: %-6d | Ref: %-9s | Status: %-12s ", 
                 appt.getAppointmentId(), appt.getReferenceNumber(), appt.getAppointmentStatus()));
-            System.out.println(String.format("| Ref: %-9s | Status: %-9s | Price: PHP %-7.2f ", 
-                appt.getAppointmentType(), (appt.getECF() > 0 ? appt.getECF() + " mins" : "Pending"), appt.getAppointmentTotalPrice()));
+            System.out.println(String.format("| Type: %-9s | ECF: %-9s | Price: PHP%-6.2f | %s", 
+                appt.getAppointmentType(), (appt.getECF() > 0 ? appt.getECF() + " mins" : "Pending"), 
+                appt.getAppointmentTotalPrice(), (appt.isPaid() ? "Paid" : "Pending" )));
             
             // Fetch and summary list of corresponding orders
             List<LaundryOrder> orders = orderDAO.getOrdersByAppointment(appt.getAppointmentId());
-            System.out.println("+-------------------------------------------------------------+");
-            System.out.println("| Orders Summary:                                             |");
-            System.out.println("+-------------------------------------------------------------+");
+            System.out.println("+---------------------------------------------------------------+");
+            System.out.println("| Orders Summary:                                               |");
+            System.out.println("+---------------------------------------------------------------+");
             for (int i = 0; i < orders.size(); i++) {
                 LaundryOrder o = orders.get(i);
                 System.out.println(String.format("| %-2d. Order #%-6d | %-12s | Weight: %-4.1fkg ", 
                     (i + 1), o.getOrderId(), o.getLaundryService(), o.getLaundryTotalKg()));
             }
-            System.out.println("+-------------------------------------------------------------+\n");
+            System.out.println("+---------------------------------------------------------------+\n");
         }
     }
 
