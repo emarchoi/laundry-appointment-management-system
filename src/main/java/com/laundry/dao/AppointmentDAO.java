@@ -10,7 +10,7 @@ import java.util.List;
 
 public class AppointmentDAO {
 
-    // 1. CREATE APPOINTMENT
+    // CREATE APPOINTMENT
     public boolean createAppointment(Appointment appointment) {
         String q = "INSERT INTO Appointment (AppointmentID, ReferenceNumber, AppointmentType, "
                 + "AppointmentTotalPrice, AppointmentStatus, AppointmentDate, EstimatedCompletionFinished) "
@@ -40,7 +40,7 @@ public class AppointmentDAO {
         }
     }
 
-    // 2. GET APPOINTMENT BY REFERENCE NUMBER
+    // GET APPOINTMENT BY REFERENCE NUMBER
     public List<Appointment> getAppointmentByReference(String referenceNumber) {
 
         List<Appointment> appointments = new ArrayList<>();
@@ -90,7 +90,7 @@ public class AppointmentDAO {
         return appointments;
     }
 
-    // 3. GET APPOINTMENT BY STATUS (Will mostly use in "Pending" Appointment)
+    // GET APPOINTMENT BY STATUS (Will mostly use in "Pending" Appointment)
     public List<Appointment> getAppointmentByStatus(String status) {
 
         List<Appointment> appointments = new ArrayList<>();
@@ -135,7 +135,7 @@ public class AppointmentDAO {
         return appointments;
     }
 
-    // 4. GET ALL APPOINTMENTS
+    // GET ALL APPOINTMENTS
     public List<Appointment> getAllAppointments() {
         
         List<Appointment> appointments = new ArrayList<>();
@@ -178,7 +178,54 @@ public class AppointmentDAO {
         return appointments;
     }
 
-    // 5. FULL UPDATE (Used by Attendant/Rider to update Status, StaffID, Price, and ECF)
+    // GET APPOINTMENTS BY Delivery
+    public List<Appointment> getDeliveryAppointment() {
+
+        List<Appointment> appointments = new ArrayList<>();
+        String q = "SELECT * FROM Appointment "
+                    + "WHERE AppointmentType = ? "
+                    + "ORDER BY AppointmentID DESC";
+        
+        String deliveryApt = "Delivery";
+
+        try (Connection conn = DatabaseConnection.getConnection(); 
+            PreparedStatement s = conn.prepareStatement(q)) {
+
+            s.setString(1, deliveryApt);
+
+            try (ResultSet rs = s.executeQuery()) {
+
+                while (rs.next()) {
+
+                    int id = rs.getInt("AppointmentID");
+                    String refNum = rs.getString("ReferenceNumber");
+                    String type = rs.getString("AppointmentType");
+                    LocalDate date = rs.getDate("AppointmentDate").toLocalDate();
+
+                    Appointment appt = new Appointment(id, refNum, type, date);
+                    appt.setAppointmentStatus(rs.getString("AppointmentStatus"));
+
+                    int staffId = rs.getInt("StaffID");
+                    if (!rs.wasNull()) {
+                        appt.setStaffId(staffId);
+                    }
+
+                    int ecf = rs.getInt("EstimatedCompletionFinished");
+                    if (!rs.wasNull()) {
+                        appt.setECF(ecf);
+                    }
+
+                    appointments.add(appt);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Database Error (Get Delivery Appointment" + e.getMessage());
+        }
+        return appointments;
+    }
+
+    // FULL UPDATE (Used by Attendant/Rider to update Status, StaffID, Price, and ECF)
     public boolean updateAppointment(Appointment appointment) {
         String q = "UPDATE Appointment SET StaffID = ?, AppointmentStatus = ?, "
                 + "AppointmentTotalPrice = ?, EstimatedCompletionFinished = ? "
