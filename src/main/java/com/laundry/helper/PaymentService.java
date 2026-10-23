@@ -12,13 +12,13 @@ public class PaymentService {
             payment.markPaid();
             return amount - balance; // Returns Change
         }
-        throw new IllegalArgumentException("Insufficient amount tendered.");
+        throw new IllegalArgumentException("Insufficient amount.");
     }
 
     public String generateDigitalPaymentQR(Appointment appointment) {
         return "+----------------------------------------------------+\n" +
                "|             [SCAN THIS QR CODE TO PAY]             |\n" +
-               "|                                                    |\n" +
+               "+----------------------------------------------------+\n" +
                "|  APPT ID : " + String.format("%-39s", appointment.getAppointmentId()) + " |\n" +
                "|  AMOUNT  : PHP " + String.format("%-35.2f", appointment.getAppointmentTotalPrice()) + " |\n" +
                "+----------------------------------------------------+";
