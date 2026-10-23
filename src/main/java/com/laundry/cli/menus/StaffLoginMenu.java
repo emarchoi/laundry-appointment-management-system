@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class StaffLoginMenu {
     private Scanner scanner;
-    private StaffDAO staffDAO = new StaffDAO(); // Added DAO
+    private StaffDAO staffDAO = new StaffDAO(); 
 
     public StaffLoginMenu(Scanner scanner) {
         this.scanner = scanner;
@@ -53,8 +53,8 @@ public class StaffLoginMenu {
                             AttendantMenu attendantMenu = new AttendantMenu(scanner, loggedInStaff);
                             attendantMenu.display();
                         } else if (loggedInStaff instanceof DeliveryRider) {
-                            System.out.println("-> Redirecting to Delivery Rider Menu (To be implemented)...");
-                            // new DeliveryRiderMenu(scanner, loggedInStaff).display();
+                            DeliveryRiderMenu deliveryRiderMenu = new DeliveryRiderMenu(scanner, loggedInStaff);
+                            deliveryRiderMenu.display();
                         }
                         
                         inLoginMenu = false; // Exit login loop after successful session ends
