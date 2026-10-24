@@ -6,11 +6,21 @@ public class DigitalPayment extends Payment implements GenerateQR {
     }
 
     @Override
-    public String generateQr() {
-        return "====================================\n" +
-               "|  [SCAN THIS QR CODE TO PAY]      |\n" +
-               "|  AMOUNT: PHP " + getAmountToBePaid() + "              |\n" +
-               "====================================";
+    public void generateQr() {
+        System.out.println("\n+-------------------------+");
+        System.out.println("|     QR CODE PAYMENT     |");
+        System.out.println("+-------------------------+");
+        System.out.println("|       SCAN TO PAY       |");
+        System.out.println("+-------------------------+");
+        System.out.println("|   [#] [ ] [#] [#] [ ]   |");
+        System.out.println("|   [ ] [#] [ ] [#] [#]   |");
+        System.out.println("|   [#] [ ] [#] [#] [ ]   |");
+        System.out.println("|   [ ] [#] [ ] [#] [#]   |");
+        System.out.println("|   [#] [ ] [#] [#] [ ]   |");
+        System.out.println("|   [ ] [#] [ ] [#] [#]   |");
+        System.out.println("+-------------------------+");
+        System.out.println(String.format("| AMOUNT: PHP %-11s |", getAmountToBePaid()));
+        System.out.println("+-------------------------+");
     }
 
     @Override
