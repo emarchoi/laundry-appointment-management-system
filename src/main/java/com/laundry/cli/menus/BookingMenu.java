@@ -11,18 +11,21 @@ import com.laundry.dao.CustomerDAO;
 import com.laundry.dao.LaundryOrderDAO;
 import com.laundry.dao.PaymentDAO;
 import com.laundry.helper.AppointmentService;
+import com.laundry.helper.CustomerService;
 import com.laundry.systemclass.Appointment;
 import com.laundry.systemclass.DigitalPayment;
 import com.laundry.systemclass.LaundryOrder;
 import com.laundry.userclass.Customer;
 
 public class BookingMenu {
+
     private Scanner scanner;
     private CustomerDAO customerDAO = new CustomerDAO();
     private AppointmentDAO appointmentDAO = new AppointmentDAO();
     private LaundryOrderDAO orderDAO = new LaundryOrderDAO();
     private PaymentDAO paymentDAO = new PaymentDAO();
-    
+
+    private CustomerService customerService = new CustomerService();
     private AppointmentService appointmentService = new AppointmentService();
 
     public BookingMenu(Scanner scanner) {
@@ -71,28 +74,100 @@ public class BookingMenu {
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|                ENTER PERSONAL DETAILS              |");
         System.out.println("+----------------------------------------------------+");
-        System.out.print("| First Name: ");
-        String fName = scanner.nextLine();
-        System.out.print("| Last Name: ");
-        String lName = scanner.nextLine();
-        System.out.print("| Phone Number (11 digits): ");
-        String phone = scanner.nextLine();
-        System.out.print("| Barangay: ");
-        String brgy = scanner.nextLine();
-        System.out.print("| Street: ");
-        String street = scanner.nextLine();
-        System.out.print("| Block No: ");
-        String block = scanner.nextLine();
+
+        // 1. First Name Validation
+        String fName = "";
+        while (true) {
+            System.out.print("| Enter First Name: ");
+            fName = scanner.nextLine().trim();
+            if (fName.isEmpty()) {
+                System.out.println("| ERROR: First Name cannot be empty.                 |");
+            } else {
+                break;
+            }
+        }
+
+        // 2. Last Name Validation
+        String lName = "";
+        while (true) {
+            System.out.print("| Enter Last Name: ");
+            lName = scanner.nextLine().trim();
+            if (lName.isEmpty()) {
+                System.out.println("| ERROR: Last Name cannot be empty.                  |");
+            } else if (!lName.matches("[a-zA-Z\\s\\.-]+")) {
+                System.out.println("| ERROR: Last Name must contain letters only.       |");
+            } else {
+                break;
+            }
+        }
+
+        // 3. Phone Number Validation (Exactly 11 digits)
+        String phoneNum = "";
+        while (true) {
+            System.out.print("| Enter Phone Number (11 digits): ");
+            phoneNum = scanner.nextLine().trim();
+            if (phoneNum.isEmpty()) {
+                System.out.println("| ERROR: Phone Number cannot be empty.              |");
+            } else if (!phoneNum.matches("\\d{11}")) {
+                System.out.println("| ERROR: Phone Number must not contain letters and must be exactly 11 digits.    |");
+            } else {
+                break;
+            }
+        }
+
+        // 4. Barangay Validation
+        String brgy = "";
+        while (true) {
+            System.out.print("| Enter Barangay: ");
+            brgy = scanner.nextLine().trim();
+            if (brgy.isEmpty()) {
+                System.out.println("| ERROR: Barangay cannot be empty.                   |");
+            } else {
+                break;
+            }
+        }
+
+        // 5. Street Validation
+        String street = "";
+        while (true) {
+            System.out.print("| Enter Street: ");
+            street = scanner.nextLine().trim();
+            if (street.isEmpty()) {
+                System.out.println("| ERROR: Street cannot be empty.                     |");
+            } else {
+                break;
+            }
+        }
+
+        // 6. Block No Validation
+        String blockNo = "";
+        while (true) {
+            System.out.print("| Enter Block No: ");
+            blockNo = scanner.nextLine().trim();
+            if (blockNo.isEmpty()) {
+                System.out.println("| ERROR: Block No cannot be empty.                   |");
+            } else {
+                break;
+            }
+        }
 
         String refNum = "REF-" + (System.currentTimeMillis() % 100000);
-        Customer customer = new Customer(fName, lName, refNum, phone, brgy, street, block);
+        Customer customer = new Customer(fName, lName, refNum, phoneNum, brgy, street, blockNo);
 
-        if (!customerDAO.addCustomer(customer)) {
+        try {
+            if (!customerService.registerCustomer(customer)) {
+                System.out.println("\n+----------------------------------------------------+");
+                System.out.println("| ERROR: Could not register customer in DB.          |");
+                System.out.println("+----------------------------------------------------+");
+                return;
+            }
+        } catch (IllegalArgumentException e) {
             System.out.println("\n+----------------------------------------------------+");
-            System.out.println("| ERROR: Could not register customer.                |");
+            System.out.println("| ERROR: " + e.getMessage());
             System.out.println("+----------------------------------------------------+");
             return;
         }
+
         System.out.println("+------------------------------------------------------+");
         System.out.println("|               -> DETAILS REGISTERED!                 |");
         System.out.println("+------------------------------------------------------+");
@@ -108,9 +183,20 @@ public class BookingMenu {
         System.out.println("| [1] Walk-In                                        |");
         System.out.println("| [2] Delivery                                       |");
         System.out.println("+----------------------------------------------------+");
-        System.out.print("SELECT TYPE: ");
-        String typeChoice = scanner.nextLine();
-        String appointmentType = typeChoice.equals("2") ? "Delivery" : "Walk-In";
+        String appointmentType = "";
+        while (true) {
+            System.out.print("SELECT TYPE: ");
+            String typeChoice = scanner.nextLine().trim();
+            if ("1".equals(typeChoice)) {
+                appointmentType = "Walk-In";
+                break;
+            } else if ("2".equals(typeChoice)) {
+                appointmentType = "Delivery";
+                break;
+            } else {
+                System.out.println("| ERROR: Enter 1 for Walk-In or 2 for Delivery.      |");
+            }
+        }
 
         int appointmentId = new Random().nextInt(900000) + 100000;
         Appointment appointment = new Appointment(appointmentId, refNum, appointmentType, LocalDate.now());
@@ -155,19 +241,25 @@ public class BookingMenu {
 
             String serviceName;
             switch (serviceChoice) {
-                case "1": serviceName = "Wash"; break;
-                case "2": serviceName = "Dry"; break;
-                case "3": serviceName = "Wash and Dry"; break;
-                default: 
-                System.out.println("+----------------------------------------------------+");
-                    System.out.println("| Invalid service. Try again.                        |");
-                    System.out.println("+----------------------------------------------------+"); 
+                case "1":
+                    serviceName = "Wash";
+                    break;
+                case "2":
+                    serviceName = "Dry";
+                    break;
+                case "3":
+                    serviceName = "Wash and Dry";
+                    break;
+                default:
+                    System.out.println("+----------------------------------------------------+");
+                    System.out.println("| ERROR: Invalid choice. Select 1, 2, 3, or 0.       |");
+                    System.out.println("+----------------------------------------------------+");
                     continue;
             }
 
             int orderId = new Random().nextInt(900000) + 100000;
             LaundryOrder order = new LaundryOrder(orderId, appointmentId, serviceName);
-            
+
             if (orderDAO.addOrder(order)) {
                 System.out.println("\n+----------------------------------------------------+");
                 System.out.println("| -> " + serviceName + " order added to appointment.");
@@ -197,12 +289,12 @@ public class BookingMenu {
         System.out.println("+----------------------------------------------------+");
         System.out.println("|                   ORDER SUMMARY                    |");
         System.out.println("+----------------------------------------------------+");
-        
+
         // Loop through the tracked orders and print them perfectly aligned
         for (int i = 0; i < orderSummaries.size(); i++) {
             System.out.println(String.format("| %-50s |", "Order #" + (i + 1) + "         : " + orderSummaries.get(i)));
         }
-        
+
         System.out.println("+----------------------------------------------------+\n");
 
         if (appointmentType.equalsIgnoreCase("Walk-In")) {
@@ -216,7 +308,7 @@ public class BookingMenu {
             System.out.println("| to collect your laundry. Thank you!                |");
             System.out.println("+----------------------------------------------------+");
         }
-        
+
     }
 
     // VIEW APPOINTMENT
@@ -224,11 +316,20 @@ public class BookingMenu {
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|                  VIEW APPOINTMENT                  |");
         System.out.println("+----------------------------------------------------+");
-        System.out.print("| Enter Reference Number: ");
-        String refNum = scanner.nextLine();
+
+        String refNum = "";
+        while (true) {
+            System.out.print("| Enter Reference Number: ");
+            refNum = scanner.nextLine().trim();
+            if (refNum.isEmpty()) {
+                System.out.println("| ERROR: Reference Number cannot be empty.          |");
+            } else {
+                break;
+            }
+        }
 
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum.toUpperCase());
-        
+
         if (appt == null) {
             System.out.println("+----------------------------------------------------+");
             System.out.println("| ERROR: No appointment found for: " + refNum);
@@ -255,7 +356,7 @@ public class BookingMenu {
         System.out.println("| ");
         System.out.println("| Total Price        : PHP " + appt.getAppointmentTotalPrice());
         System.out.println("| Payment Status     : " + (appt.isPaid() ? "Paid" : "Pending"));
-        
+
         System.out.println("+----------------------------------------------------+");
         System.out.println("| ORDERS SUMMARY:                                    |");
         System.out.println("+----------------------------------------------------+");
@@ -267,8 +368,8 @@ public class BookingMenu {
             for (int i = 0; i < orders.size(); i++) {
                 LaundryOrder order = orders.get(i);
                 String weightStr = order.getLaundryTotalKg() > 0 ? String.format("%.1f kg", order.getLaundryTotalKg()) : "Pending weigh-in";
-                System.out.println(String.format("|   %d. %-13s | Weight: %-21s |", 
-                    (i + 1), order.getLaundryService(), weightStr));
+                System.out.println(String.format("|   %d. %-13s | Weight: %-21s |",
+                        (i + 1), order.getLaundryService(), weightStr));
             }
         }
         System.out.println("+----------------------------------------------------+");
@@ -288,8 +389,18 @@ public class BookingMenu {
                 digitalPayment.generateQr();
                 System.out.println("+-------------------------+");
                 System.out.println("| Confirm Digital Payment |");
-                System.out.print("| [1] Yes  [0] No: ");
-                String confirm = scanner.nextLine().trim();
+
+                String confirm;
+
+                while (true) {
+                    System.out.print("| [1] Yes  [0] No: ");
+                    confirm = scanner.nextLine().trim();
+                    
+                    if (confirm.equals("1") || confirm.equals("0")) {
+                        break;
+                    }
+                    System.out.println("| Invalid input! Please enter 1 or 0.");
+                }
 
                 if ("1".equals(confirm)) {
                     digitalPayment.setAmountPaid(appt.getAppointmentTotalPrice());
@@ -323,11 +434,20 @@ public class BookingMenu {
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|                 CANCEL APPOINTMENT                 |");
         System.out.println("+----------------------------------------------------+");
-        System.out.print("| Enter Reference Number: ");
-        String refNum = scanner.nextLine();
+
+        String refNum = "";
+        while (true) {
+            System.out.print("| Enter Reference Number: ");
+            refNum = scanner.nextLine().trim();
+            if (refNum.isEmpty()) {
+                System.out.println("| ERROR: Reference Number cannot be empty.          |");
+            } else {
+                break;
+            }
+        }
 
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
-        
+
         if (appt == null) {
             System.out.println("+----------------------------------------------------+");
             System.out.println("| ERROR: No appointment found.                       |");
@@ -338,19 +458,19 @@ public class BookingMenu {
         if (appt.canBeCancelled()) {
             System.out.print("| Are you sure you want to cancel? (Y/N): ");
             String confirm = scanner.nextLine();
-            
+
             if (confirm.equalsIgnoreCase("Y")) {
                 appt.setAppointmentStatus("Cancelled");
                 if (appointmentDAO.updateAppointment(appt)) {
-                    System.out.println("+----------------------------------------------------+");
+                    System.out.println("\n+----------------------------------------------------+");
                     System.out.println("| -> Appointment successfully cancelled.             |");
                 } else {
-                    System.out.println("+----------------------------------------------------+");
+                    System.out.println("\n+----------------------------------------------------+");
                     System.out.println("| ERROR: Could not cancel appointment in database.   |");
                 }
             }
         } else {
-            System.out.println("+----------------------------------------------------+");
+            System.out.println("\n+----------------------------------------------------+");
             System.out.println("| ERROR: Cannot cancel. Status is: " + appt.getAppointmentStatus());
         }
         System.out.println("+----------------------------------------------------+");
