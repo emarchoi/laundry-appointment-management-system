@@ -495,6 +495,7 @@ public class AttendantMenu {
                 payment.markPaid();
 
                 if (paymentDAO.createPayment(payment, "Cash")) {
+                    appt.setPayment(payment);
                     System.out.println("\n+----------------------------------------------------+");
                     System.out.println("|             PAYMENT RECORDED SUCCESSFULLY          |");
                     System.out.println("+----------------------------------------------------+");
@@ -515,6 +516,7 @@ public class AttendantMenu {
                 payment.markPaid();
 
                 if (paymentDAO.createPayment(payment, "E-Payment")) {
+                    appt.setPayment(payment);
                     System.out.println("\n+----------------------------------------------------+");
                     System.out.println("|          E-PAYMENT CONFIRMED SUCCESSFULLY!         |");
                     System.out.println("+----------------------------------------------------+");
