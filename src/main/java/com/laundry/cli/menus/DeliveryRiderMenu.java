@@ -72,9 +72,9 @@ public class DeliveryRiderMenu {
     }
 
     private void viewDeliveryAppointments() {
-        System.out.println("\n+---------------------------------------------------------+");
-        System.out.println("|                DELIVERY APPOINTMENTS LIST               |");
-        System.out.println("+---------------------------------------------------------+");
+        System.out.println("\n+----------------------------------------------------+");
+        System.out.println("|             DELIVERY APPOINTMENTS LIST             |");
+        System.out.println("+----------------------------------------------------+");
 
         List<Appointment> deliveryList = appointmentDAO.getDeliveryAppointment();
 
@@ -86,10 +86,29 @@ public class DeliveryRiderMenu {
         }
 
         for (Appointment appt : deliveryList) {
-            System.out.println(String.format("| ID: %-6d | Ref: %-10s | Status: %-13s ", 
+
+            Customer customer = customerDAO.getCustomerDetails(appt.getReferenceNumber());
+
+            System.out.println("+----------------------------------------------------+");
+            System.out.println(String.format("| %-10s | %-15s | %-19s |", "Appt. ID", "Ref Num", "Status"));
+            System.out.println("+----------------------------------------------------+");
+            System.out.println(String.format("| %-10d | %-15s | %s", 
                 appt.getAppointmentId(), appt.getReferenceNumber(), appt.getAppointmentStatus()));
+
+            String name = (customer != null) ? customer.getFullName() : "N/A";
+            String phone = (customer != null) ? customer.getPhoneNumber() : "N/A";
+            String barangay = (customer != null) ? customer.getBarangay() : "N/A";
+            String street = (customer != null) ? customer.getStreet() : "N/A";
+            String blkNo = (customer != null) ? customer.getBlockNo() : "N/A";
+
+            System.out.println("+----------------------------------------------------+");
+            System.out.println("| CONTACT DETAILS:                                   |");
+            System.out.println("+----------------------------------------------------+");
+            System.out.println(String.format("| Name    : %s", name));
+            System.out.println(String.format("| Phone   : %s", phone));
+            System.out.println(String.format("| Address : %s, %s, %s", barangay, street, blkNo));
+            System.out.println("+----------------------------------------------------+\n");
         }
-        System.out.println("+---------------------------------------------------------+");
     }
 
     private void updateDeliveryStatus() {
