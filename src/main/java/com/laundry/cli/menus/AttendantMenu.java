@@ -48,7 +48,7 @@ public class AttendantMenu {
             System.out.println("\n+----------------------------------------------------+");
             System.out.println(String.format("| %-50s |", "ATTENDANT MENU - Welcome, " + loggedInStaff.getFullName()));
             System.out.println("+----------------------------------------------------+");
-            System.out.println("|  [1] VIEW PENDING APPOINTMENTS (Assign Machines)   |");
+            System.out.println("|  [1] VIEW PENDING APPOINTMENTS                     |");
             System.out.println("|  [2] VIEW ALL APPOINTMENTS                         |");
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [3] PROCESS PAYMENT                               |");
@@ -310,7 +310,7 @@ public class AttendantMenu {
             System.out.println("+---------------------------------------------------------------+");
             for (int i = 0; i < orders.size(); i++) {
                 LaundryOrder o = orders.get(i);
-                System.out.println(String.format("| %-2d. Order #%-6d | %-12s | Weight: %-4.1fkg ", 
+                System.out.println(String.format("| %d. Order #%-6d | %-12s | Weight: %-4.1fkg ", 
                     (i + 1), o.getOrderId(), o.getLaundryService(), o.getLaundryTotalKg()));
             }
             System.out.println("+---------------------------------------------------------------+\n");
