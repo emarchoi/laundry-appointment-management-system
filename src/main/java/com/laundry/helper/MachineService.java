@@ -13,26 +13,14 @@ public class MachineService {
         return (int) Math.ceil(totalWeightKg / Machine.getMaxCapacity());
     }
 
-    public double calculateOrderPrice(int machinesUsed, Machine machine) {
-        return machinesUsed * machine.getBasePrice();
+    public double calculateOrderPrice(int machinesUsed, double machinePrice) {
+        return machinesUsed * machinePrice;
     }
 
-    public double computeLaundryLoad(double totalWeightKg, int machinesUsed) {
+    public double calculateLaundryLoad(double totalWeightKg, int machinesUsed) {
         if (machinesUsed == 0) {
             return 0;
         }
         return totalWeightKg / machinesUsed;
-    }
-
-    public void computeAndSetECF(Appointment appointment, List<MachineUsage> machines) {
-
-        int totalMinutes = 0;
-
-        for(MachineUsage machine : machines) {
-
-            totalMinutes += machine.getLaundryDuration();
-        }
-
-        appointment.setECF(totalMinutes);
     }
 }
