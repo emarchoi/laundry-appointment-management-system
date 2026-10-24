@@ -146,8 +146,8 @@ public class AttendantMenu {
             order.setLaundryTotalKg(weight);
 
             // Calculate number of machines needed: CEILING(Weight / 7)
-            int machinesNeeded = machineService.calculateMachinesRequired(weight);
-            order.setMachinesUsed(machinesNeeded);
+            int machinesRequired = machineService.calculateMachinesRequired(weight);
+            order.setMachinesUsed(machinesRequired);
 
             // Determine machine base price
             double basePrice = order.getLaundryService().equalsIgnoreCase("Dry") ? 65.0 : 50.0;
@@ -155,7 +155,7 @@ public class AttendantMenu {
                 basePrice = 115.0;
             }
 
-            double orderPrice = machineService.calculateOrderPrice(machinesNeeded, basePrice);
+            double orderPrice = machineService.calculateOrderPrice(machinesRequired, basePrice);
             order.setOrderTotalPrice(orderPrice);
             orderDAO.updateOrderDetails(order);
 
@@ -171,7 +171,7 @@ public class AttendantMenu {
                 requiredTypes.add("Dryer");
             }
 
-            double loadPerMachine = machineService.computeLaundryLoad(weight, machinesNeeded);
+            double loadPerMachine = machineService.calculateLaundryLoad(weight, machinesRequired);
 
             // Track machines chosen in this session to prevent double-assigning in the same prompt
             List<Integer> assignedInThisSession = new ArrayList<>();
@@ -202,7 +202,7 @@ public class AttendantMenu {
                 }
                 System.out.println("+----------------------------------------------------+");
 
-                for (int i = 1; i <= machinesNeeded; i++) {
+                for (int i = 1; i <= machinesRequired; i++) {
                     int chosenMachineId = -1;
                     boolean validSelection = false;
 
