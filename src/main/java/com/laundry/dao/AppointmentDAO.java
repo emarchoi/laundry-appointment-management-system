@@ -2,6 +2,9 @@ package com.laundry.dao;
 
 import com.laundry.config.DatabaseConnection;
 import com.laundry.systemclass.Appointment;
+import com.laundry.systemclass.Cash;
+import com.laundry.systemclass.DigitalPayment;
+import com.laundry.systemclass.Payment;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -40,187 +43,146 @@ public class AppointmentDAO {
         }
     }
 
-    // GET APPOINTMENT BY REFERENCE NUMBER
-    public List<Appointment> getAppointmentByReference(String referenceNumber) {
+    private Appointment appointmentHelper(ResultSet rs) throws SQLException {
+        int id = rs.getInt("AppointmentID");
+        String refNum = rs.getString("ReferenceNumber");
+        String type = rs.getString("AppointmentType");
+        LocalDate date = rs.getDate("AppointmentDate").toLocalDate();
 
+        Appointment appt = new Appointment(id, refNum, type, date);
+        appt.setAppointmentStatus(rs.getString("AppointmentStatus"));
+
+        int staffId = rs.getInt("StaffID");
+        if (!rs.wasNull()) {
+            appt.setStaffId(staffId);
+        }
+
+        int ecf = rs.getInt("EstimatedCompletionFinished");
+        if (!rs.wasNull()) {
+            appt.setECF(ecf);
+        }
+
+        double totalPrice = rs.getDouble("AppointmentTotalPrice");
+        appt.setAppointmentTotalPrice(totalPrice);
+
+        // Attach Payment object if present in DB
+        int paymentId = rs.getInt("PaymentID");
+        if (!rs.wasNull() && paymentId > 0) {
+            String pStatus = rs.getString("PaymentStatus");
+            String pMethod = rs.getString("PaymentMethod");
+            double pAmount = rs.getDouble("AmountPaid");
+
+            Payment payment;
+            if ("E-Payment".equalsIgnoreCase(pMethod)) {
+                payment = new DigitalPayment(paymentId, id, 0.0);
+            } else {
+                payment = new Cash(paymentId, id, 0.0);
+            }
+            payment.setAmountPaid(pAmount);
+            if ("Paid".equalsIgnoreCase(pStatus)) {
+                payment.markPaid();
+            }
+            appt.setPayment(payment);
+        }
+
+        return appt;
+    }
+
+    // GET APPOINTMENTS BY REFERENCE NUMBER
+    public List<Appointment> getAppointmentsByReference(String referenceNumber) {
         List<Appointment> appointments = new ArrayList<>();
-        String q = "SELECT * FROM Appointment "
-                + "WHERE ReferenceNumber = ?";
+        String q = "SELECT a.*, p.PaymentID, p.AmountPaid, p.PaymentMethod, p.PaymentStatus " +
+                       "FROM Appointment a " +
+                       "LEFT JOIN Payment p ON a.AppointmentID = p.AppointmentID " +
+                       "WHERE a.ReferenceNumber = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection(); 
-            PreparedStatement s = conn.prepareStatement(q)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement s = conn.prepareStatement(q)) {
 
             s.setString(1, referenceNumber);
 
             try (ResultSet rs = s.executeQuery()) {
-
                 while (rs.next()) {
-
-                    int id = rs.getInt("AppointmentID");
-                    String type = rs.getString("AppointmentType");
-                    LocalDate date = rs.getDate("AppointmentDate").toLocalDate();
-
-                    Appointment appointment
-                            = new Appointment(id, referenceNumber, type, date);
-
-                    appointment.setAppointmentStatus(
-                            rs.getString("AppointmentStatus"));
-
-                    // Safely handle nullable StaffID
-                    int staffId = rs.getInt("StaffID");
-                    if (!rs.wasNull()) {
-                        appointment.setStaffId(staffId);
-                    }
-
-                    // Safely handle nullable ECF
-                    int ecf = rs.getInt("EstimatedCompletionFinished");
-                    if (!rs.wasNull()) {
-                        appointment.setECF(ecf);
-                    }
-
-                    appointments.add(appointment);
+                    appointments.add(appointmentHelper(rs));
                 }
             }
-
         } catch (SQLException e) {
-            System.err.println(
-                    "Database Error (Get Appointment by Reference): "
-                    + e.getMessage());
+            System.err.println("Database Error (Get Appointments by Reference): " + e.getMessage());
         }
         return appointments;
     }
 
     // GET APPOINTMENT BY STATUS (Will mostly use in "Pending" Appointment)
-    public List<Appointment> getAppointmentByStatus(String status) {
-
+    // GET APPOINTMENTS BY STATUS (With Payment LEFT JOIN)
+    public List<Appointment> getAppointmentsByStatus(String status) {
         List<Appointment> appointments = new ArrayList<>();
+        String q = "SELECT a.*, p.PaymentID, p.AmountPaid, p.PaymentMethod, p.PaymentStatus " +
+                       "FROM Appointment a " +
+                       "LEFT JOIN Payment p ON a.AppointmentID = p.AppointmentID " +
+                       "WHERE a.AppointmentStatus = ? " +
+                       "ORDER BY a.AppointmentID DESC";
 
-        String q = "SELECT * FROM Appointment "
-                + "WHERE AppointmentStatus = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection(); 
-            PreparedStatement s = conn.prepareStatement(q)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement s = conn.prepareStatement(q)) {
 
             s.setString(1, status);
 
             try (ResultSet rs = s.executeQuery()) {
-
                 while (rs.next()) {
-
-                    int id = rs.getInt("AppointmentID");
-                    String refNum = rs.getString("ReferenceNumber");
-                    String type = rs.getString("AppointmentType");
-                    LocalDate date = rs.getDate("AppointmentDate").toLocalDate();
-
-                    Appointment appt = new Appointment(id, refNum, type, date);
-                    appt.setAppointmentStatus(rs.getString("AppointmentStatus"));
-
-                    int staffId = rs.getInt("StaffID");
-                    if (!rs.wasNull()) {
-                        appt.setStaffId(staffId);
-                    }
-
-                    int ecf = rs.getInt("EstimatedCompletionFinished");
-                    if (!rs.wasNull()) {
-                        appt.setECF(ecf);
-                    }
-
-                    appointments.add(appt);
+                    appointments.add(appointmentHelper(rs));
                 }
             }
-
         } catch (SQLException e) {
-            System.err.println();
+            System.err.println("Database Error (Get Appointments by Status): " + e.getMessage());
         }
         return appointments;
     }
 
     // GET ALL APPOINTMENTS
+    // GET ALL APPOINTMENTS (With Payment LEFT JOIN)
     public List<Appointment> getAllAppointments() {
-        
         List<Appointment> appointments = new ArrayList<>();
-        String q = "SELECT * FROM Appointment "
-                    + "ORDER BY AppointmentID DESC";
+        String q = "SELECT a.*, p.PaymentID, p.AmountPaid, p.PaymentMethod, p.PaymentStatus " +
+                       "FROM Appointment a " +
+                       "LEFT JOIN Payment p ON a.AppointmentID = p.AppointmentID " +
+                       "ORDER BY a.AppointmentID DESC";
 
-        try (Connection conn = DatabaseConnection.getConnection(); 
-            PreparedStatement s = conn.prepareStatement(q)) {
-            
-            ResultSet rs = s.executeQuery();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement s = conn.prepareStatement(q);
+             ResultSet rs = s.executeQuery()) {
 
             while (rs.next()) {
-                int id = rs.getInt("AppointmentID");
-                String refNum = rs.getString("ReferenceNumber");
-                String type = rs.getString("AppointmentType");
-                LocalDate date = rs.getDate("AppointmentDate").toLocalDate();
-
-                Appointment appt = new Appointment(id, refNum, type, date);
-                appt.setAppointmentStatus(rs.getString("AppointmentStatus"));
-
-                int staffId = rs.getInt("StaffID");
-                if (!rs.wasNull()) {
-                    appt.setStaffId(staffId);
-                }
-
-                int ecf = rs.getInt("EstimatedCompletionFinished");
-                if (!rs.wasNull()) {
-                    appt.setECF(ecf);
-                }
-
-                double totalPrice = rs.getDouble("AppointmentTotalPrice");
-                appt.setAppointmentTotalPrice(totalPrice);  
-
-                appointments.add(appt);
+                appointments.add(appointmentHelper(rs));
             }
-
         } catch (SQLException e) {
             System.err.println("Database Error (Get All Appointments): " + e.getMessage());
         }
         return appointments;
     }
 
-    // GET APPOINTMENTS BY Delivery
+    // GET DELIVERY APPOINTMENT
     public List<Appointment> getDeliveryAppointment() {
-
         List<Appointment> appointments = new ArrayList<>();
-        String q = "SELECT * FROM Appointment "
-                    + "WHERE AppointmentType = ? "
-                    + "ORDER BY AppointmentID DESC";
-        
-        String deliveryApt = "Delivery";
+        String q = "SELECT a.*, p.PaymentID, p.AmountPaid, p.PaymentMethod, p.PaymentStatus " +
+                       "FROM Appointment a " +
+                       "LEFT JOIN Payment p ON a.AppointmentID = p.AppointmentID " +
+                       "WHERE a.AppointmentType = ? " +
+                       "ORDER BY a.AppointmentID DESC";
 
-        try (Connection conn = DatabaseConnection.getConnection(); 
-            PreparedStatement s = conn.prepareStatement(q)) {
+        String deliveryApt = "Delivery";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement s = conn.prepareStatement(q)) {
 
             s.setString(1, deliveryApt);
 
             try (ResultSet rs = s.executeQuery()) {
-
                 while (rs.next()) {
-
-                    int id = rs.getInt("AppointmentID");
-                    String refNum = rs.getString("ReferenceNumber");
-                    String type = rs.getString("AppointmentType");
-                    LocalDate date = rs.getDate("AppointmentDate").toLocalDate();
-
-                    Appointment appt = new Appointment(id, refNum, type, date);
-                    appt.setAppointmentStatus(rs.getString("AppointmentStatus"));
-
-                    int staffId = rs.getInt("StaffID");
-                    if (!rs.wasNull()) {
-                        appt.setStaffId(staffId);
-                    }
-
-                    int ecf = rs.getInt("EstimatedCompletionFinished");
-                    if (!rs.wasNull()) {
-                        appt.setECF(ecf);
-                    }
-
-                    appointments.add(appt);
+                    appointments.add(appointmentHelper(rs));
                 }
             }
-
         } catch (SQLException e) {
-            System.err.println("Database Error (Get Delivery Appointment" + e.getMessage());
+            System.err.println("Database Error (Get Appointments by Type): " + e.getMessage());
         }
         return appointments;
     }
