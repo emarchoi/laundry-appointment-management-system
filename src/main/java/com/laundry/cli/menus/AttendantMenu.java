@@ -155,7 +155,7 @@ public class AttendantMenu {
                 basePrice = 115.0;
             }
 
-            double orderPrice = machinesNeeded * basePrice;
+            double orderPrice = machineService.calculateOrderPrice(machinesNeeded, basePrice);
             order.setOrderTotalPrice(orderPrice);
             orderDAO.updateOrderDetails(order);
 
@@ -171,7 +171,7 @@ public class AttendantMenu {
                 requiredTypes.add("Dryer");
             }
 
-            double loadPerMachine = weight / machinesNeeded;
+            double loadPerMachine = machineService.computeLaundryLoad(weight, machinesNeeded);
 
             // Track machines chosen in this session to prevent double-assigning in the same prompt
             List<Integer> assignedInThisSession = new ArrayList<>();
