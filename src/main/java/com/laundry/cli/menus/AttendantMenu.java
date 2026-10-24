@@ -51,10 +51,10 @@ public class AttendantMenu {
             System.out.println("|  [1] VIEW PENDING APPOINTMENTS (Assign Machines)   |");
             System.out.println("|  [2] VIEW ALL APPOINTMENTS                         |");
             System.out.println("+----------------------------------------------------+");
-            System.out.println("|  [3] UPDATE APPOINTMENT STATUS                     |");
-            System.out.println("|  [4] VIEW LAUNDRY MACHINES                         |");
+            System.out.println("|  [3] PROCESS PAYMENT                               |");
+            System.out.println("|  [4] UPDATE APPOINTMENT STATUS                     |");
             System.out.println("+----------------------------------------------------+");
-            System.out.println("|  [5] PROCESS PAYMENT                               |");
+            System.out.println("|  [5] VIEW LAUNDRY MACHINES                         |");
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [0] LOGOUT                                        |");
             System.out.println("+----------------------------------------------------+");
@@ -69,14 +69,14 @@ public class AttendantMenu {
                 case "2": 
                     viewAllAppointments();
                     break;
-                case "3": 
-                    // updateAppointment();
+                case "3":
+                    processPayment(); 
                     break;
                 case "4":
-                    viewLaundryMachines();
+                    // updateAppointment();
                     break;
                 case "5":
-                    processPayment();
+                    viewLaundryMachines();
                     break;
                 case "0":
                     System.out.println("\n+----------------------------------------------------+");
