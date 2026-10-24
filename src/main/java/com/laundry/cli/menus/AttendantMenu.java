@@ -470,7 +470,19 @@ public class AttendantMenu {
 
             if (newStatus != null) {
                 appt.setAppointmentStatus(newStatus);
-                appt.setStaffId(loggedInStaff.getStaffId()); // Assign staff ID who updated the status
+                appt.setStaffId(loggedInStaff.getStaffId());
+
+                // Release machines & reset ECF when set to Ready for Pickup
+                if ("Ready for Pickup".equalsIgnoreCase(newStatus)) {
+                    List<LaundryOrder> orders = orderDAO.getOrdersByAppointment(appt.getAppointmentId());
+                    for (LaundryOrder order : orders) {
+                        List<MachineUsage> usages = machineUsageDAO.getUsageByOrder(order.getOrderId());
+                        for (MachineUsage usage : usages) {
+                            machineDAO.updateMachineStatus(usage.getMachineId(), "Available");
+                        }
+                    }
+                    appt.setECF(0);
+                }
 
                 if (appointmentDAO.updateAppointment(appt)) {
                     System.out.println("\n+----------------------------------------------------+");
@@ -478,6 +490,9 @@ public class AttendantMenu {
                     System.out.println("+----------------------------------------------------+");
                     System.out.println(String.format("| New Status : %-37s |", newStatus));
                     System.out.println(String.format("| Updated By : %-37s |", loggedInStaff.getFullName()));
+                    if ("Ready for Pickup".equalsIgnoreCase(newStatus)) {
+                        System.out.println(String.format("| Machines   : %-37s |", "Released to 'Available'"));
+                    }
                     System.out.println("+----------------------------------------------------+");
                 } else {
                     System.out.println("\n+----------------------------------------------------+");
@@ -572,6 +587,9 @@ public class AttendantMenu {
 
                 if (paymentDAO.createPayment(payment, "Cash")) {
                     appt.setPayment(payment);
+                    appt.setAppointmentStatus("Completed");
+                    appointmentDAO.updateAppointment(appt);
+
                     System.out.println("\n+----------------------------------------------------+");
                     System.out.println("|             PAYMENT RECORDED SUCCESSFULLY          |");
                     System.out.println("+----------------------------------------------------+");
@@ -593,6 +611,9 @@ public class AttendantMenu {
 
                 if (paymentDAO.createPayment(payment, "E-Payment")) {
                     appt.setPayment(payment);
+                    appt.setAppointmentStatus("Completed");
+                    appointmentDAO.updateAppointment(appt);
+                    
                     System.out.println("\n+----------------------------------------------------+");
                     System.out.println("|          E-PAYMENT CONFIRMED SUCCESSFULLY!         |");
                     System.out.println("+----------------------------------------------------+");
