@@ -35,7 +35,7 @@ public class CustomerDAO {
         }
     }
 
-    public List<Customer> getCustomerDetails(String referenceNumber) {
+    public Customer getCustomerDetails(String referenceNumber) {
 
         List<Customer> customers = new ArrayList<>();
         String q = "SELECT * FROM Customer "
