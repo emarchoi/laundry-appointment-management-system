@@ -9,9 +9,10 @@ import java.util.Scanner;
 import com.laundry.dao.AppointmentDAO;
 import com.laundry.dao.CustomerDAO;
 import com.laundry.dao.LaundryOrderDAO;
+import com.laundry.dao.PaymentDAO;
 import com.laundry.helper.AppointmentService;
-import com.laundry.helper.PaymentService;
 import com.laundry.systemclass.Appointment;
+import com.laundry.systemclass.DigitalPayment;
 import com.laundry.systemclass.LaundryOrder;
 import com.laundry.userclass.Customer;
 
@@ -20,9 +21,9 @@ public class BookingMenu {
     private CustomerDAO customerDAO = new CustomerDAO();
     private AppointmentDAO appointmentDAO = new AppointmentDAO();
     private LaundryOrderDAO orderDAO = new LaundryOrderDAO();
+    private PaymentDAO paymentDAO = new PaymentDAO();
     
     private AppointmentService appointmentService = new AppointmentService();
-    private PaymentService paymentService = new PaymentService();
 
     public BookingMenu(Scanner scanner) {
         this.scanner = scanner;
@@ -254,20 +255,66 @@ public class BookingMenu {
         System.out.println("| ");
         System.out.println("| Total Price        : PHP " + appt.getAppointmentTotalPrice());
         System.out.println("| Payment Status     : " + (appt.isPaid() ? "Paid" : "Pending"));
+        
+        System.out.println("+----------------------------------------------------+");
+        System.out.println("| ORDERS SUMMARY:                                    |");
+        System.out.println("+----------------------------------------------------+");
+
+        List<LaundryOrder> orders = orderDAO.getOrdersByAppointment(appt.getAppointmentId());
+        if (orders.isEmpty()) {
+            System.out.println("|   No orders created by this appointment.          |");
+        } else {
+            for (int i = 0; i < orders.size(); i++) {
+                LaundryOrder order = orders.get(i);
+                String weightStr = order.getLaundryTotalKg() > 0 ? String.format("%.1f kg", order.getLaundryTotalKg()) : "Pending weigh-in";
+                System.out.println(String.format("|   %d. %-13s | Weight: %-21s |", 
+                    (i + 1), order.getLaundryService(), weightStr));
+            }
+        }
         System.out.println("+----------------------------------------------------+");
 
         if (!appt.isPaid() && appt.getAppointmentTotalPrice() > 0) {
+            System.out.println("\n+----------------------------------------------------+");
             System.out.println("| [1] Generate Digital Payment QR                    |");
             System.out.println("| [0] Back to Menu                                   |");
             System.out.println("+----------------------------------------------------+");
             System.out.print("SELECT OPTION: ");
             String payChoice = scanner.nextLine();
 
-            if (payChoice.equals("1")) {
-                System.out.println("\n" + paymentService.generateDigitalPaymentQR(appt));
-                System.out.println("+----------------------------------------------------+");
-                System.out.println("-> Please show this QR code to the attendant.");
-                System.out.println("+----------------------------------------------------+");
+            if ("1".equals(payChoice)) {
+                int paymentId = new Random().nextInt(900000) + 100000;
+                DigitalPayment digitalPayment = new DigitalPayment(paymentId, appt.getAppointmentId(), appt.getAppointmentTotalPrice());
+
+                digitalPayment.generateQr();
+                System.out.println("+-------------------------+");
+                System.out.println("| Confirm Digital Payment |");
+                System.out.print("| [1] Yes  [0] No: ");
+                String confirm = scanner.nextLine().trim();
+
+                if ("1".equals(confirm)) {
+                    digitalPayment.setAmountPaid(appt.getAppointmentTotalPrice());
+                    digitalPayment.markPaid();
+
+                    if (paymentDAO.createPayment(digitalPayment, "E-Payment")) {
+                        appt.setPayment(digitalPayment);
+                        System.out.println("\n+-----------------------------------------------+");
+                        System.out.println("|          DIGITAL PRE-PAYMENT SUCCESSFUL!      |");
+                        System.out.println("+-----------------------------------------------+");
+                        System.out.println(String.format("| Payment ID        : %-25d |", paymentId));
+                        System.out.println(String.format("| Customer Ref No.  : %-25s |", appt.getReferenceNumber()));
+                        System.out.println(String.format("| Amount Paid       : PHP %-21.2f |", appt.getAppointmentTotalPrice()));
+                        System.out.println(String.format("| Payment           : %-25s |", "Paid (E-Payment)"));
+                        System.out.println("+-----------------------------------------------+");
+                    } else {
+                        System.out.println("\n+-----------------------------------------------+");
+                        System.out.println("| ERROR: Failed to record payment in database.  |");
+                        System.out.println("+-----------------------------------------------+");
+                    }
+                } else {
+                    System.out.println("\n+-----------------------------------------------+");
+                    System.out.println("| Pre-payment cancelled.                             |");
+                    System.out.println("+-----------------------------------------------+");
+                }
             }
         }
     }
