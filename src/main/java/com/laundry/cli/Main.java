@@ -8,14 +8,9 @@ public class Main {
         
         Scanner scanner = new Scanner(System.in);
 
-        // BookingMenu bookingMenu = new BookingMenu(scanner);
-
-        // bookingMenu.display();
-
         MainMenu menu = new MainMenu(scanner);
 
         menu.display();
-
 
     }
 }

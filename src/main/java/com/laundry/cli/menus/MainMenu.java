@@ -28,7 +28,8 @@ public class MainMenu {
             switch (choice) {
                 case "1":
                     System.out.println("\n-> Redirecting to Booking Menu...");
-                    new BookingMenu(scanner).display();
+                    BookingMenu bookingMenu = new BookingMenu(scanner);
+                    bookingMenu.display();
                     break;
                 case "2":
                     System.out.println("\n-> Redirecting to Staff Login...");
