@@ -1,5 +1,5 @@
 package com.laundry.systemclass;
 
 public interface GenerateQR {
-    String generateQr();
+    void generateQr();
 }
