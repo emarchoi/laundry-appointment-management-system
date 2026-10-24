@@ -20,6 +20,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class DeliveryRiderMenu {
+
     private Scanner scanner;
     private Staff loggedInRider;
 
@@ -94,23 +95,23 @@ public class DeliveryRiderMenu {
 
         for (Appointment appt : deliveryList) {
             Customer customer = customerDAO.getCustomerDetails(appt.getReferenceNumber());
-        
+
             String name = (customer != null) ? customer.getFullName() : "N/A";
             String phone = (customer != null) ? customer.getPhoneNumber() : "N/A";
             String barangay = (customer != null) ? customer.getBarangay() : "N/A";
             String street = (customer != null) ? customer.getStreet() : "N/A";
             String blkNo = (customer != null) ? customer.getBlockNo() : "N/A";
             String fullAddress = barangay + ", " + street + ", " + blkNo;
-        
+
             String payStatus = appt.isPaid() ? "Paid" : "Pending";
             String priceStr = String.format("PHP%.2f", appt.getAppointmentTotalPrice());
-        
+
             System.out.println("+--------------------------------------------------------------+");
             System.out.println(String.format("| %-6s | %-9s | %-16s | %-10s | %-7s |", "ID", "Ref Num", "Status", "Price", "Payment"));
             System.out.println("+--------------------------------------------------------------+");
-            System.out.println(String.format("| %-6d | %-9s | %-16s | %-10s | %-7s |", 
-                appt.getAppointmentId(), appt.getReferenceNumber(), appt.getAppointmentStatus(), priceStr, payStatus));
-        
+            System.out.println(String.format("| %-6d | %-9s | %-16s | %-10s | %-7s |",
+                    appt.getAppointmentId(), appt.getReferenceNumber(), appt.getAppointmentStatus(), priceStr, payStatus));
+
             System.out.println("+--------------------------------------------------------------+");
             System.out.println("| CONTACT DETAILS:                                             |");
             System.out.println("+--------------------------------------------------------------+");
@@ -159,6 +160,7 @@ public class DeliveryRiderMenu {
                 for (MachineUsage usage : usages) {
                     machineDAO.updateMachineStatus(usage.getMachineId(), "Available");
                 }
+                machineUsageDAO.deleteUsageByOrder(order.getOrderId()); // Resets AssignedTo to 'None'
             }
             appt.setECF(0);
 
@@ -214,7 +216,7 @@ public class DeliveryRiderMenu {
         }
 
         System.out.println(String.format("| Total Amount Due: PHP %-28.2f |", totalAmount));
-        
+
         boolean validAmount = false;
         double amountPaid = 0.0;
 
@@ -249,10 +251,10 @@ public class DeliveryRiderMenu {
             System.out.println("\n+----------------------------------------------------+");
             System.out.println("|             PAYMENT RECORDED SUCCESSFULLY          |");
             System.out.println("+----------------------------------------------------+");
-            System.out.println(String.format("| Amount Due      : PHP %-28.2f |", totalAmount));
-            System.out.println(String.format("| Amount Paid : PHP %-28.2f |", amountPaid));
-            System.out.println(String.format("| Change          : PHP %-28.2f |", change));
-            System.out.println(String.format("| New Status      : %-28s |", "Completed"));
+            System.out.println(String.format("| Amount Due      : PHP %.2f", totalAmount));
+            System.out.println(String.format("| Amount Paid     : PHP %.2f", amountPaid));
+            System.out.println(String.format("| Change          : PHP %.2f", change));
+            System.out.println(String.format("| New Status      : %s", "Completed"));
             System.out.println("+----------------------------------------------------+");
         } else {
             System.out.println("\n+----------------------------------------------------+");
