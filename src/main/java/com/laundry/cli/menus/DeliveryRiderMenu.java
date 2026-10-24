@@ -72,67 +72,70 @@ public class DeliveryRiderMenu {
     }
 
     private void viewDeliveryAppointments() {
-        System.out.println("\n+----------------------------------------------------+");
-        System.out.println("|             DELIVERY APPOINTMENTS LIST             |");
-        System.out.println("+----------------------------------------------------+");
+        System.out.println("\n+--------------------------------------------------------------+");
+        System.out.println("|                 DELIVERY APPOINTMENTS LIST                   |");
+        System.out.println("+--------------------------------------------------------------+");
 
         List<Appointment> deliveryList = appointmentDAO.getDeliveryAppointment();
 
         if (deliveryList.isEmpty()) {
-            System.out.println("\n+----------------------------------------------------+");
-            System.out.println("| No delivery appointments found.                    |");
-            System.out.println("+----------------------------------------------------+");
+            System.out.println("\n+--------------------------------------------------------------+");
+            System.out.println("| No delivery appointments found.                              |");
+            System.out.println("+--------------------------------------------------------------+");
             return;
         }
 
         for (Appointment appt : deliveryList) {
-
             Customer customer = customerDAO.getCustomerDetails(appt.getReferenceNumber());
-
-            System.out.println("+----------------------------------------------------+");
-            System.out.println(String.format("| %-10s | %-15s | %-19s |", "Appt. ID", "Ref Num", "Status"));
-            System.out.println("+----------------------------------------------------+");
-            System.out.println(String.format("| %-10d | %-15s | %s", 
-                appt.getAppointmentId(), appt.getReferenceNumber(), appt.getAppointmentStatus()));
-
+        
             String name = (customer != null) ? customer.getFullName() : "N/A";
             String phone = (customer != null) ? customer.getPhoneNumber() : "N/A";
             String barangay = (customer != null) ? customer.getBarangay() : "N/A";
             String street = (customer != null) ? customer.getStreet() : "N/A";
             String blkNo = (customer != null) ? customer.getBlockNo() : "N/A";
-
-            System.out.println("+----------------------------------------------------+");
-            System.out.println("| CONTACT DETAILS:                                   |");
-            System.out.println("+----------------------------------------------------+");
-            System.out.println(String.format("| Name    : %s", name));
-            System.out.println(String.format("| Phone   : %s", phone));
-            System.out.println(String.format("| Address : %s, %s, %s", barangay, street, blkNo));
-            System.out.println("+----------------------------------------------------+\n");
+            String fullAddress = barangay + ", " + street + ", " + blkNo;
+        
+            String payStatus = appt.isPaid() ? "Paid" : "Pending";
+            String priceStr = String.format("PHP%.2f", appt.getAppointmentTotalPrice());
+        
+            System.out.println("+--------------------------------------------------------------+");
+            System.out.println(String.format("| %-6s | %-9s | %-16s | %-10s | %-7s |", "ID", "Ref Num", "Status", "Price", "Payment"));
+            System.out.println("+--------------------------------------------------------------+");
+            System.out.println(String.format("| %-6d | %-9s | %-16s | %-10s | %-7s |", 
+                appt.getAppointmentId(), appt.getReferenceNumber(), appt.getAppointmentStatus(), priceStr, payStatus));
+        
+            System.out.println("+--------------------------------------------------------------+");
+            System.out.println("| CONTACT DETAILS:                                             |");
+            System.out.println("+--------------------------------------------------------------+");
+            System.out.println(String.format("| Name    : %-50s |", name));
+            System.out.println(String.format("| Phone   : %-50s |", phone));
+            System.out.println(String.format("| Address : %-50s |", fullAddress));
+            System.out.println("+--------------------------------------------------------------+\n");
         }
     }
 
     private void updateDeliveryStatus() {
-        System.out.println("\n+----------------------------------------------------+");
-        System.out.println("|               UPDATE DELIVERY STATUS               |");
-        System.out.println("+----------------------------------------------------+");
+        System.out.println("\n+--------------------------------------------------------------+");
+        System.out.println("|                    UPDATE DELIVERY STATUS                    |");
+        System.out.println("+--------------------------------------------------------------+");
         System.out.print("| Enter Reference Number: ");
         String refNum = scanner.nextLine().trim();
 
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
 
         if (appt == null || !"Delivery".equalsIgnoreCase(appt.getAppointmentType())) {
-            System.out.println("\n+----------------------------------------------------+");
-            System.out.println("| ERROR: Valid delivery appointment not found.      |");
-            System.out.println("+----------------------------------------------------+");
+            System.out.println("\n+--------------------------------------------------------------+");
+            System.out.println("| ERROR: Valid delivery appointment not found.                 |");
+            System.out.println("+--------------------------------------------------------------+");
             return;
         }
 
-        System.out.println("\n+----------------------------------------------------+");
-        System.out.println(String.format("| Current Status: %-34s |", appt.getAppointmentStatus()));
-        System.out.println("+----------------------------------------------------+");
-        System.out.println("|  [1] Set to 'Out for Delivery'                     |");
-        System.out.println("|  [2] Set to 'Completed'                            |");
-        System.out.println("+----------------------------------------------------+");
+        System.out.println("\n+--------------------------------------------------------------+");
+        System.out.println(String.format("| Current Status: %-44s |", appt.getAppointmentStatus()));
+        System.out.println("+--------------------------------------------------------------+");
+        System.out.println("|  [1] Set to 'Out for Delivery'                               |");
+        System.out.println("|  [2] Set to 'Completed'                                      |");
+        System.out.println("+--------------------------------------------------------------+");
         System.out.print("SELECT NEW STATUS: ");
 
         String statusChoice = scanner.nextLine();
@@ -143,9 +146,9 @@ public class DeliveryRiderMenu {
         } else if (statusChoice.equals("2")) {
             newStatus = "Completed";
         } else {
-            System.out.println("\n+----------------------------------------------------+");
-            System.out.println("| Invalid selection. Operation cancelled.            |");
-            System.out.println("+----------------------------------------------------+");
+            System.out.println("\n+--------------------------------------------------------------+");
+            System.out.println("| Invalid selection. Operation cancelled.                      |");
+            System.out.println("+--------------------------------------------------------------+");
             return;
         }
 
@@ -153,42 +156,42 @@ public class DeliveryRiderMenu {
         appt.setStaffId(loggedInRider.getStaffId());
 
         if (appointmentDAO.updateAppointment(appt)) {
-            System.out.println("\n+----------------------------------------------------+");
+            System.out.println("\n+--------------------------------------------------------------+");
             System.out.println(String.format("| -> Status updated to '%s'", newStatus));
-            System.out.println("+----------------------------------------------------+");
+            System.out.println("+--------------------------------------------------------------+");
         } else {
-            System.out.println("\n+----------------------------------------------------+");
-            System.out.println("| ERROR: Failed to update status in database.        |");
-            System.out.println("+----------------------------------------------------+");
+            System.out.println("\n+--------------------------------------------------------------+");
+            System.out.println("| ERROR: Failed to update status in database.                  |");
+            System.out.println("+--------------------------------------------------------------+");
         }
     }
 
     private void processDeliveryPayment() {
-        System.out.println("\n+----------------------------------------------------+");
-        System.out.println("|              PROCESS DELIVERY PAYMENT              |");
-        System.out.println("+----------------------------------------------------+");
+        System.out.println("\n+--------------------------------------------------------------+");
+        System.out.println("|                   PROCESS DELIVERY PAYMENT                   |");
+        System.out.println("+--------------------------------------------------------------+");
         System.out.print("| Enter Reference Number: ");
         String refNum = scanner.nextLine().trim();
 
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
 
         if (appt == null) {
-            System.out.println("\n+----------------------------------------------------+");
-            System.out.println("| ERROR: Appointment not found.                       |");
-            System.out.println("+----------------------------------------------------+");
+            System.out.println("\n+--------------------------------------------------------------+");
+            System.out.println("| ERROR: Appointment not found.                                |");
+            System.out.println("+--------------------------------------------------------------+");
             return;
         }
 
         if (appt.isPaid()) {
-            System.out.println("\n+----------------------------------------------------+");
-            System.out.println("| Appointment is ALREADY PAID.                       |");
-            System.out.println("+----------------------------------------------------+");
+            System.out.println("\n+--------------------------------------------------------------+");
+            System.out.println("| Appointment is ALREADY PAID.                                 |");
+            System.out.println("+--------------------------------------------------------------+");
             return;
         }
 
         double totalAmount = appt.getAppointmentTotalPrice();
-        System.out.println(String.format("| Total Amount Due: PHP %-28.2f |", totalAmount));
-        System.out.println("+----------------------------------------------------+");
+        System.out.println(String.format("| Total Amount Due: PHP %-38.2f |", totalAmount));
+        System.out.println("+--------------------------------------------------------------+");
 
         boolean validAmount = false;
         double amountPaid = 0.0;
@@ -200,16 +203,16 @@ public class DeliveryRiderMenu {
             try {
                 amountPaid = Double.parseDouble(input);
                 if (amountPaid < totalAmount) {
-                    System.out.println("\n+-----------------------------------------------+");
-                    System.out.println("| ERROR: Amount paid is less than total due.    |");
-                    System.out.println("+-----------------------------------------------+");
+                    System.out.println("\n+--------------------------------------------------------------+");
+                    System.out.println("| ERROR: Amount paid is less than total due.                   |");
+                    System.out.println("+--------------------------------------------------------------+");
                 } else {
                     validAmount = true;
                 }
             } catch (NumberFormatException e) {
-                System.out.println("\n+-----------------------------------------------+");
-                System.out.println("| ERROR: Enter a valid amount.                    |");
-                System.out.println("+-----------------------------------------------+");
+                System.out.println("\n+--------------------------------------------------------------+");
+                System.out.println("| ERROR: Enter a valid amount.                                 |");
+                System.out.println("+--------------------------------------------------------------+");
             }
         }
 
@@ -224,17 +227,17 @@ public class DeliveryRiderMenu {
         payment.markPaid();
 
         if (paymentDAO.createPayment(payment, "Cash")) {
-            System.out.println("\n+----------------------------------------------------+");
-            System.out.println("|             PAYMENT RECORDED SUCCESSFULLY          |");
-            System.out.println("+----------------------------------------------------+");
-            System.out.println(String.format("| Amount Due      : PHP %-28.2f |", totalAmount));
-            System.out.println(String.format("| Amount Paid     : PHP %-28.2f |", amountPaid));
-            System.out.println(String.format("| Change          : PHP %-28.2f |", change));
-            System.out.println("+----------------------------------------------------+");
+            System.out.println("\n+--------------------------------------------------------------+");
+            System.out.println("|                PAYMENT RECORDED SUCCESSFULLY                 |");
+            System.out.println("+--------------------------------------------------------------+");
+            System.out.println(String.format("| Amount Due      : PHP %-38.2f |", totalAmount));
+            System.out.println(String.format("| Amount Paid     : PHP %-38.2f |", amountPaid));
+            System.out.println(String.format("| Change          : PHP %-38.2f |", change));
+            System.out.println("+--------------------------------------------------------------+");
         } else {
-            System.out.println("\n+----------------------------------------------------+");
-            System.out.println("| ERROR: Could not record payment in database.       |");
-            System.out.println("+----------------------------------------------------+");
+            System.out.println("\n+--------------------------------------------------------------+");
+            System.out.println("| ERROR: Could not record payment in database.                 |");
+            System.out.println("+--------------------------------------------------------------+");
         }
     }
 }
