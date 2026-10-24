@@ -50,11 +50,10 @@ public class AttendantMenu {
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [1] VIEW PENDING APPOINTMENTS                     |");
             System.out.println("|  [2] VIEW ALL APPOINTMENTS                         |");
+            System.out.println("|  [3] VIEW LAUNDRY MACHINES                         |");
             System.out.println("+----------------------------------------------------+");
-            System.out.println("|  [3] PROCESS PAYMENT                               |");
             System.out.println("|  [4] UPDATE APPOINTMENT STATUS                     |");
-            System.out.println("+----------------------------------------------------+");
-            System.out.println("|  [5] VIEW LAUNDRY MACHINES                         |");
+            System.out.println("|  [5] PROCESS PAYMENT                               |");
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [0] LOGOUT                                        |");
             System.out.println("+----------------------------------------------------+");
@@ -70,13 +69,13 @@ public class AttendantMenu {
                     viewAllAppointments();
                     break;
                 case "3":
-                    processPayment(); 
+                    viewLaundryMachines(); 
                     break;
                 case "4":
-                    // updateAppointment();
+                    updateAppointmentStatus();
                     break;
                 case "5":
-                    viewLaundryMachines();
+                    processPayment();
                     break;
                 case "0":
                     System.out.println("\n+----------------------------------------------------+");
@@ -409,6 +408,83 @@ public class AttendantMenu {
             System.out.println("\n+----------------------------------------------------+");
             System.out.println("| ERROR: Failed to update machine status in DB.      |");
             System.out.println("+----------------------------------------------------+");
+        }
+    }
+
+    private void updateAppointmentStatus() {
+        System.out.println("\n+----------------------------------------------------+");
+        System.out.println("|              UPDATE APPOINTMENT STATUS             |");
+        System.out.println("+----------------------------------------------------+");
+        System.out.print("| Enter Reference Number: ");
+        String refNum = scanner.nextLine().trim();
+
+        Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
+
+        if (appt == null) {
+            System.out.println("\n+----------------------------------------------------+");
+            System.out.println("| ERROR: Appointment not found.                      |");
+            System.out.println("+----------------------------------------------------+");
+            return;
+        }
+
+        System.out.println("\n+----------------------------------------------------+");
+        System.out.println(String.format("| Reference Number : %-31s |", appt.getReferenceNumber()));
+        System.out.println(String.format("| Current Status   : %-31s |", appt.getAppointmentStatus()));
+        System.out.println(String.format("| Appointment Type : %-31s |", appt.getAppointmentType()));
+        
+        boolean validSelection = false;
+
+        while (!validSelection) {
+            System.out.println("+----------------------------------------------------+");
+            System.out.println("| Select New Status:                                 |");
+            System.out.println("+----------------------------------------------------+");
+            System.out.println("|  [1] In Progress                                   |");
+            System.out.println("|  [2] Ready for Pickup                              |");
+            System.out.println("+----------------------------------------------------+");
+            System.out.println("|  [0] Cancel                                        |");
+            System.out.println("+----------------------------------------------------+");
+            System.out.print("SELECT OPTION: ");
+            String choice = scanner.nextLine().trim();
+
+            String newStatus = null;
+
+            switch (choice) {
+                case "1":
+                    newStatus = "In Progress";
+                    validSelection = true;
+                    break;
+                case "2":
+                    newStatus = "Ready for Pickup";
+                    validSelection = true;
+                    break;
+                case "0":
+                    System.out.println("\n+----------------------------------------------------+");
+                    System.out.println("| Operation cancelled. Returning to menu.            |");
+                    System.out.println("+----------------------------------------------------+");
+                    return;
+                default:
+                    System.out.println("\n+----------------------------------------------------+");
+                    System.out.println("| Invalid option. Please try again.                  |");
+                    System.out.println("+----------------------------------------------------+");
+            }
+
+            if (newStatus != null) {
+                appt.setAppointmentStatus(newStatus);
+                appt.setStaffId(loggedInStaff.getStaffId()); // Assign staff ID who updated the status
+
+                if (appointmentDAO.updateAppointment(appt)) {
+                    System.out.println("\n+----------------------------------------------------+");
+                    System.out.println("|            STATUS UPDATED SUCCESSFULLY!            |");
+                    System.out.println("+----------------------------------------------------+");
+                    System.out.println(String.format("| New Status : %-37s |", newStatus));
+                    System.out.println(String.format("| Updated By : %-37s |", loggedInStaff.getFullName()));
+                    System.out.println("+----------------------------------------------------+");
+                } else {
+                    System.out.println("\n+----------------------------------------------------+");
+                    System.out.println("| ERROR: Failed to update status in database.        |");
+                    System.out.println("+----------------------------------------------------+");
+                }
+            }
         }
     }
 
