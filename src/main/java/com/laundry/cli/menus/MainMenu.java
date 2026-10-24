@@ -3,6 +3,7 @@ package com.laundry.cli.menus;
 import java.util.Scanner;
 
 public class MainMenu {
+    
     private Scanner scanner;
 
     public MainMenu(Scanner scanner) {
