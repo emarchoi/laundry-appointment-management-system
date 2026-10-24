@@ -19,8 +19,6 @@ public abstract class Machine {
     public double getBasePrice() { return basePrice; }
     public String getMachineStatus() { return machineStatus; }
 
-    public void updateMachineStatus(String machineStatus) { this.machineStatus = machineStatus; }
-
     public boolean isAvailable() {
         return "Available".equalsIgnoreCase(machineStatus);
     }

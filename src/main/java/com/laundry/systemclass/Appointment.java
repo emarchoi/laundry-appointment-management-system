@@ -99,9 +99,13 @@ public class Appointment {
         return orders;
     }
 
-    public void addOrder(LaundryOrder order) {
-        this.orders.add(order);
-        computeAppointmentTotalPrice(); // Automatically updates the price when an order is added
+    // Payment Management
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 
     public void computeAppointmentTotalPrice() {
@@ -113,15 +117,6 @@ public class Appointment {
             total += order.getOrderTotalPrice();
         }
         this.appointmentTotalPrice = total;
-    }
-
-    // Payment Management
-    public Payment getPayment() {
-        return payment;
-    }
-
-    public void setPayment(Payment payment) {
-        this.payment = payment;
     }
 
     public boolean isPaid() {

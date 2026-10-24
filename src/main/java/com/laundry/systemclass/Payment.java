@@ -24,6 +24,8 @@ public abstract class Payment {
 
 
     // Setters
+    public void setPaymentId(int paymentId) { this.paymentId = paymentId; }
+    public void setAppointmentId(int appointmentId) { this.appointmentId = appointmentId; }
     public void setAmountToBePaid(double amountToBePaid) { this.amountToBePaid = amountToBePaid; }
     public void setAmountPaid(double amountPaid) { this.amountPaid = amountPaid; }
     public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }

@@ -33,8 +33,5 @@ public class LaundryOrder {
     public void setOrderTotalPrice(double orderTotalPrice) { this.orderTotalPrice = orderTotalPrice; }
     public void setMachinesUsed(int machinesUsed) { this.machinesUsed = machinesUsed; }
 
-    public boolean isAssigned() {
-        return machinesUsed > 0;
-    }
 
 }
