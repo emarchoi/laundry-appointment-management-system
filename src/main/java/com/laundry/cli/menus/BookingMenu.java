@@ -248,12 +248,12 @@ public class BookingMenu {
         if (appt.getECF() > 0) {
             System.out.println("| Est. Duration      : " + appt.getECF() + " minutes");
         } else {
-            System.out.println("| Est. Duration      : Pending Assignment");
+            System.out.println("| Est. Duration      : 0 minutes");
         }
 
         System.out.println("| ");
         System.out.println("| Total Price        : PHP " + appt.getAppointmentTotalPrice());
-        System.out.println("| Payment Status     : " + (appt.isPaid() ? "" : "Pending"));
+        System.out.println("| Payment Status     : " + (appt.isPaid() ? "Paid" : "Pending"));
         System.out.println("+----------------------------------------------------+");
 
         if (!appt.isPaid() && appt.getAppointmentTotalPrice() > 0) {
