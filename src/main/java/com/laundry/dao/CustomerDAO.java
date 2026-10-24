@@ -37,7 +37,6 @@ public class CustomerDAO {
 
     public Customer getCustomerDetails(String referenceNumber) {
 
-        List<Customer> customers = new ArrayList<>();
         String q = "SELECT * FROM Customer "
                     + "WHERE ReferenceNumber = ?";
 
@@ -48,7 +47,7 @@ public class CustomerDAO {
 
             try (ResultSet rs = s.executeQuery()) {
 
-                while (rs.next()) {
+                if (rs.next()) {
 
                     String refNum = rs.getString("ReferenceNumber");
                     String firstName = rs.getString("FirstName");
@@ -59,8 +58,8 @@ public class CustomerDAO {
                     String blkNo = rs.getString("BlockNo");
 
                     Customer customer = new Customer(firstName, lastName, refNum, phoneNum, barangay, street, blkNo);
-
-                    customers.add(customer);
+                    
+                    return customer;
                 }
             }
 
@@ -68,6 +67,6 @@ public class CustomerDAO {
         } catch (SQLException e) {
             System.err.println("Database Error (Get Customer Details): " + e.getMessage());
         }
-        return customers;
+        return null;
     }
 }
