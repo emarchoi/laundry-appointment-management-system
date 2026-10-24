@@ -1,6 +1,5 @@
 package com.laundry.helper;
 
-import com.laundry.systemclass.Appointment;
 import com.laundry.systemclass.Payment;
 
 public class PaymentService {
@@ -13,14 +12,5 @@ public class PaymentService {
             return amount - balance; // Returns Change
         }
         throw new IllegalArgumentException("Insufficient amount.");
-    }
-
-    public String generateDigitalPaymentQR(Appointment appointment) {
-        return "+----------------------------------------------------+\n" +
-               "|             [SCAN THIS QR CODE TO PAY]             |\n" +
-               "+----------------------------------------------------+\n" +
-               "|  APPT ID : " + String.format("%-39s", appointment.getAppointmentId()) + " |\n" +
-               "|  AMOUNT  : PHP " + String.format("%-35.2f", appointment.getAppointmentTotalPrice()) + " |\n" +
-               "+----------------------------------------------------+";
     }
 }
