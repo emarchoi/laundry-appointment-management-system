@@ -23,10 +23,12 @@ public class Customer extends User{
     public String getBarangay(){ return barangay; }
     public String getStreet() { return street; }
     public String getBlockNo() { return blockNo; }
+    public String getFullAddress() { return barangay + " " + street + " " + blockNo;}
     
     public void setReferenceNumber(String referenceNumber) { this.referenceNumber = referenceNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public void setBarangay(String barangay){ this.barangay = barangay; }
     public void setStreet(String street){ this.street = street; }
     public void setBlockNo(String blockNo) { this.blockNo = blockNo; }
+    
 }
