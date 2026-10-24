@@ -21,7 +21,7 @@ public class AppointmentService {
     public Appointment getFullAppointmentDetails(String referenceNumber) {
 
         // 1. Get the base appointment from the database
-        List<Appointment> appointments = appointmentDAO.getAppointmentByReference(referenceNumber);
+        List<Appointment> appointments = appointmentDAO.getAppointmentsByReference(referenceNumber);
         if (appointments.isEmpty()) {
             return null; // Appointment not found
         }
