@@ -47,13 +47,13 @@ public class AttendantMenu {
     private MachineService machineService = new MachineService();
 
     // Constructor initializing the Scanner and the currently logged-in Attendant
-    // Used in Main.java
+    // Used in StaffLoginMenu.java
     public AttendantMenu(Scanner scanner, Staff loggedInStaff) {
         this.scanner = scanner;
         this.loggedInStaff = loggedInStaff;
     }
 
-    // Entry point, display loop showing options for the Laundry Attendant
+    // Entry point, display loop showing UI for the Laundry Attendant
     public void display() {
         boolean inAttendantMenu = true;
 

@@ -19,11 +19,17 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+/*
+    User interface menu for the Delivery Rider role.
+    Handles viewing delivery orders, updating status to 'Out for Delivery', and processing cash payments on delivery.
+*/
 public class DeliveryRiderMenu {
 
+    // Inputs and logged-in user session
     private Scanner scanner;
     private Staff loggedInRider;
 
+    // Database access objects (DAOs) for database CRUD queries
     private AppointmentDAO appointmentDAO = new AppointmentDAO();
     private CustomerDAO customerDAO = new CustomerDAO();
     private LaundryOrderDAO orderDAO = new LaundryOrderDAO();
@@ -31,13 +37,17 @@ public class DeliveryRiderMenu {
     private MachineUsageDAO machineUsageDAO = new MachineUsageDAO();
     private PaymentDAO paymentDAO = new PaymentDAO();
 
+    // Helper classes instantiation
     private AppointmentService appointmentService = new AppointmentService();
 
+    // Constructor initializing the Scanner and the currently logged-in Attendant
+    // Used in StaffLoginMenu.java
     public DeliveryRiderMenu(Scanner scanner, Staff loggedInRider) {
         this.scanner = scanner;
         this.loggedInRider = loggedInRider;
     }
 
+    // Entry point, display loop showing UI for the Delivery Rider
     public void display() {
         boolean inRiderMenu = true;
 
@@ -79,11 +89,13 @@ public class DeliveryRiderMenu {
         }
     }
 
+    // Option [1]: Displays all delivery appointments along with customer contact and address details
     private void viewDeliveryAppointments() {
         System.out.println("\n+--------------------------------------------------------------+");
         System.out.println("|                 DELIVERY APPOINTMENTS LIST                   |");
         System.out.println("+--------------------------------------------------------------+");
 
+        // Fetch all delivery type appointments from database
         List<Appointment> deliveryList = appointmentDAO.getDeliveryAppointment();
 
         if (deliveryList.isEmpty()) {
@@ -93,6 +105,7 @@ public class DeliveryRiderMenu {
             return;
         }
 
+        // Loop through delivery appointments and display details with customer contact info
         for (Appointment appt : deliveryList) {
             Customer customer = customerDAO.getCustomerDetails(appt.getReferenceNumber());
 
@@ -120,8 +133,10 @@ public class DeliveryRiderMenu {
             System.out.println(String.format("| Address : %-50s |", fullAddress));
             System.out.println("+--------------------------------------------------------------+\n");
         }
-    }
+    } // end of [1] : viewDeliveryAppointments
 
+    // Option [2]: Updates delivery appointment status to 'Out for Delivery'
+    // Releases assigned machines back to 'Available' and clears the ECF timer
     private void updateOutForDeliveryStatus() {
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|       UPDATE STATUS : OUT FOR DELIVERY             |");
@@ -129,6 +144,8 @@ public class DeliveryRiderMenu {
         System.out.print("| Enter Reference Number: ");
         String refNum = scanner.nextLine().trim();
 
+        // Retrieve full appointment record of refnum
+        // Onle one appointment
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
 
         if (appt == null || !"Delivery".equalsIgnoreCase(appt.getAppointmentType())) {
@@ -138,6 +155,7 @@ public class DeliveryRiderMenu {
             return;
         }
 
+        // Double Confirmation
         System.out.println("\n+----------------------------------------------------+");
         System.out.println(String.format("| Reference Number : %-31s |", appt.getReferenceNumber()));
         System.out.println(String.format("| Current Status   : %-31s |", appt.getAppointmentStatus()));
@@ -148,12 +166,11 @@ public class DeliveryRiderMenu {
         System.out.println("+----------------------------------------------------+");
         System.out.print("SELECT OPTION: ");
         String choice = scanner.nextLine().trim();
-
         if ("1".equals(choice)) {
             appt.setAppointmentStatus("Out for Delivery");
             appt.setStaffId(loggedInRider.getStaffId());
 
-            // Release assigned machines back to 'Available' & clear ECF timer
+            // Release assigned machines back to 'Available', delete usage records, and reset ECF timer
             List<LaundryOrder> orders = orderDAO.getOrdersByAppointment(appt.getAppointmentId());
             
             for (LaundryOrder order : orders) {
@@ -161,10 +178,11 @@ public class DeliveryRiderMenu {
                 for (MachineUsage usage : usages) {
                     machineDAO.updateMachineStatus(usage.getMachineId(), "Available");
                 }
-                machineUsageDAO.deleteUsageByOrder(order.getOrderId()); // Resets AssignedTo to 'None'
+                machineUsageDAO.deleteUsageByOrder(order.getOrderId());
             }
             appt.setECF(0);
 
+            // Save status update to database
             if (appointmentDAO.updateAppointment(appt)) {
                 System.out.println("\n+----------------------------------------------------+");
                 System.out.println("|            STATUS UPDATED SUCCESSFULLY!            |");
@@ -183,8 +201,11 @@ public class DeliveryRiderMenu {
             System.out.println("| Operation cancelled. Returning to menu.            |");
             System.out.println("+----------------------------------------------------+");
         }
-    }
+    } // end [2] : updateStatus
 
+    // Option [3]: Collects cash payment upon delivery, computes change, 
+    // and automatically updates appointment status to 'Completed'
+    // If customer wants to pay using QRCode, pay in the BookingMenu(viewAppointment - Pay Digital)
     private void processCashPayment() {
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|                 PROCESS CASH PAYMENT               |");
@@ -192,8 +213,11 @@ public class DeliveryRiderMenu {
         System.out.print("| Enter Reference Number: ");
         String refNum = scanner.nextLine().trim();
 
+        // Retrieve appointment details from database using reference number
+        // Only one
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
 
+        // Appointment - Paymetn valdiation
         if (appt == null) {
             System.out.println("\n+----------------------------------------------------+");
             System.out.println("| ERROR: Appointment not found.                      |");
@@ -221,6 +245,7 @@ public class DeliveryRiderMenu {
         boolean validAmount = false;
         double amountPaid = 0.0;
 
+        // Input loop to ensure valid cash amount is entered
         while (!validAmount) {
             System.out.print("| Enter Amount Paid: ");
             String input = scanner.nextLine().trim();
@@ -237,12 +262,14 @@ public class DeliveryRiderMenu {
             }
         }
 
+        // Compute change and create Cash payment instance
         double change = amountPaid - totalAmount;
         int paymentId = new Random().nextInt(900000) + 100000;
         Payment payment = new Cash(paymentId, appt.getAppointmentId(), totalAmount);
         payment.setAmountPaid(amountPaid);
         payment.markPaid();
 
+        // Save payment to database and update appointment status to Completed
         if (paymentDAO.createPayment(payment, "Cash")) {
             appt.setPayment(payment);
             appt.setAppointmentStatus("Completed");
@@ -262,5 +289,5 @@ public class DeliveryRiderMenu {
             System.out.println("| ERROR: Could not record payment in database.       |");
             System.out.println("+----------------------------------------------------+");
         }
-    }
+    } // end [3] : processCashPayment
 }
