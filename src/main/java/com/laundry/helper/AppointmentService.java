@@ -76,9 +76,9 @@ public class AppointmentService {
 
             try {
                 weight = Double.parseDouble(weightInput);
-                if (weight <= 0) {
+                if (weight <= 0 || weight >= 21) {
                     System.out.println("\n+----------------------------------------------------+");
-                    System.out.println("| ERROR: Weight must be greater than 0. Try again.   |");
+                    System.out.println("| ERROR: Weight must be between 0 and 20. Try again. |");
                     System.out.println("+----------------------------------------------------+");
                 } else {
                     validWeight = true;
