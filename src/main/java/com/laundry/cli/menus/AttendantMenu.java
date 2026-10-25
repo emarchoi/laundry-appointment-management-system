@@ -6,15 +6,14 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
-import com.laundry.dao.CustomerDAO;
 import com.laundry.dao.AppointmentDAO;
+import com.laundry.dao.CustomerDAO;
 import com.laundry.dao.LaundryOrderDAO;
 import com.laundry.dao.MachineDAO;
 import com.laundry.dao.MachineUsageDAO;
 import com.laundry.dao.PaymentDAO;
 import com.laundry.helper.AppointmentService;
 import com.laundry.helper.MachineService;
-import com.laundry.userclass.Customer;
 import com.laundry.machineclass.Machine;
 import com.laundry.systemclass.Appointment;
 import com.laundry.systemclass.Cash;
@@ -22,6 +21,7 @@ import com.laundry.systemclass.DigitalPayment;
 import com.laundry.systemclass.LaundryOrder;
 import com.laundry.systemclass.MachineUsage;
 import com.laundry.systemclass.Payment;
+import com.laundry.userclass.Customer;
 import com.laundry.userclass.Staff;
 
 /*
@@ -233,7 +233,7 @@ public class AttendantMenu {
 
                     // Re-prompt loop for assignment validation
                     while (!validSelection) {
-                        System.out.print("| Select " + mType + " ID #" + i + " to assign: ");
+                        System.out.print("| Select " + mType + " ID #" + " to assign: ");
                         try {
                             chosenMachineId = Integer.parseInt(scanner.nextLine());
                         } catch (NumberFormatException e) {
@@ -297,7 +297,7 @@ public class AttendantMenu {
             System.out.println("+----------------------------------------------------+");
             System.out.println(String.format("| Final Total Price : PHP %-26.2f |", selectedAppt.getAppointmentTotalPrice()));
             System.out.println(String.format("| Estimated Duration: %-30s |", selectedAppt.getECF() + " minutes"));
-            System.out.println("+----------------------------------------------------+\n");
+            System.out.println("+----------------------------------------------------+");
         } else {
             System.out.println("\n+----------------------------------------------------+");
             System.out.println("| ERROR: Failed to update appointment status.       |");
@@ -469,7 +469,7 @@ public class AttendantMenu {
             // Perform bulk deletion if confirmed
             if ("Y".equalsIgnoreCase(confirmInput)) {
                 boolean success = appointmentDAO.clearCancelledAppointments();
-                System.out.println("+----------------------------------------------------+");
+                System.out.println("\n+----------------------------------------------------+");
                 if (success) {
                     System.out.println(String.format("| %-50s |", "SUCCESS: All cancelled appointments cleared."));
                 } else {
@@ -696,7 +696,10 @@ public class AttendantMenu {
 
                 if (paymentDAO.createPayment(payment, "Cash")) {
                     appt.setPayment(payment);
-                    appt.setAppointmentStatus("Completed");
+
+                    if(!"In Progress".equalsIgnoreCase(appt.getAppointmentStatus())) {
+                        appt.setAppointmentStatus("Completed");
+                    }
                     appointmentDAO.updateAppointment(appt);
 
                     System.out.println("\n+----------------------------------------------------+");
@@ -721,7 +724,10 @@ public class AttendantMenu {
 
                 if (paymentDAO.createPayment(payment, "E-Payment")) {
                     appt.setPayment(payment);
-                    appt.setAppointmentStatus("Completed");
+
+                    if(!"In Progress".equalsIgnoreCase(appt.getAppointmentStatus())) {
+                        appt.setAppointmentStatus("Completed");
+                    }
                     appointmentDAO.updateAppointment(appt);
 
                     System.out.println("\n+----------------------------------------------------+");
