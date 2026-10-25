@@ -3,12 +3,15 @@ package com.laundry.dao;
 import com.laundry.config.DatabaseConnection;
 import com.laundry.machineclass.*;
 
+import java.lang.reflect.Constructor;
 import java.sql.*;
 import java.util.*;
 
+/*
+    Data Access Object (DAO) for managing washer and dryer records in the database
+*/
 public class MachineDAO {
-
-    // Helper Class for Machine Details with Usage
+    // Helper class that holds machine status together with its active usage details
     public static class MachineUsageDetail {
         private int machineId;
         private String machineType;
@@ -17,6 +20,7 @@ public class MachineDAO {
         private String machineStatus;
         private int duration;
 
+        // Constructor to initialize machine usage detail fields
         public MachineUsageDetail(int machineId, String machineType, double laundryLoad, String assignedTo, String machineStatus, int duration) {
             this.machineId = machineId;
             this.machineType = machineType;
@@ -34,7 +38,9 @@ public class MachineDAO {
         public int getDuration() { return duration; }
     }
 
-    // 1. GET ALL MACHINES (Enter Machine Type: Washer / Dryer)
+    // Retrieves all machines matching a specific type ("Washer" or "Dryer")
+    // Used in viewing machines - show full details
+    // FOLLOWS CRUD - Read
     public List<Machine> getMachinesByType(String machineType) {
 
         List<Machine> machines = new ArrayList<>();
@@ -66,7 +72,9 @@ public class MachineDAO {
         return machines;
     }
 
-    // GET SINGLE MACHINE BY ID
+    // Retrieves a single machine record by its unique Machine ID
+    // Used mostly for validation, to check if the machine is available
+    // FOLLOWS CRUD - Read
     public Machine getMachineById(int machineId) {
         String query = "SELECT * FROM Machine WHERE MachineID = ?";
         
@@ -93,7 +101,10 @@ public class MachineDAO {
         return null;
     }
 
-    // 2. UPDATE MACHINE STATUS (Available -> In Use)
+    // Updates the status of a physical machine in the database
+    // Used to update machine automatically to Available after an order is finished / In use if an order is assigned
+    // Used to update machine to Under Maintenance
+    // FOLLOWS CRUD - Update
     public boolean updateMachineStatus(int machineId, String newStatus) {
 
         String q = "UPDATE Machine "
@@ -114,7 +125,9 @@ public class MachineDAO {
         }
     }
 
-    // 3. GET MACHINES WITH USAGE DETAILS FILTERED BY TYPE ("Washer" or "Dryer")
+    // Fetches machines by type along with active usage information from MachineUsage
+    // Show full details of machines with the order assigned to it
+    // FOLLOWS CRUD - Read  
     public List<MachineUsageDetail> getMachineAssignmentDetails(String machineType) {
         List<MachineUsageDetail> machUsageDet = new ArrayList<>();
         String q = "SELECT m.MachineID, m.MachineType, m.MachineStatus, " +
