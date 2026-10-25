@@ -155,6 +155,7 @@ public class DeliveryRiderMenu {
 
             // Release assigned machines back to 'Available' & clear ECF timer
             List<LaundryOrder> orders = orderDAO.getOrdersByAppointment(appt.getAppointmentId());
+            
             for (LaundryOrder order : orders) {
                 List<MachineUsage> usages = machineUsageDAO.getUsageByOrder(order.getOrderId());
                 for (MachineUsage usage : usages) {

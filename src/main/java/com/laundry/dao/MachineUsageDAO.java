@@ -8,9 +8,16 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+    Data Access Object (DAO) for managing MachineUsage records in the database.
+    Connects laundry orders to assigned physical machines
+*/
+
 public class MachineUsageDAO {
 
-    // 1. ADD MACHINE USAGE (When Attendant assigns a machine)
+    // Inserts a new machine usage record linking a laundry order to a physical machine
+    // Used when Attendant assigns a machine
+    // FOLLOWS CRUD - Create
     public boolean addMachineUsage(MachineUsage usage) {
         String q = "INSERT INTO MachineUsage (OrderID, MachineID, LaundryLoadKg, "
                         + "LaundryStartTime, LaundryDuration) "
@@ -33,7 +40,11 @@ public class MachineUsageDAO {
         }
     }
 
-    // 2. GET MACHINES USED BY AN ORDER
+    // Retrieves all machine usage records associated with a specific laundry order ID
+    // Mainly used for machine usage and order tracking
+    // Used for releasing assigned machines (In AttendantMenu & DeliveryRiderMenu)
+    // Used for computing ecf
+    // FOLLOW CRUD - Read
     public List<MachineUsage> getUsageByOrder(int orderId) {
         List<MachineUsage> usages = new ArrayList<>();
         String q = "SELECT * FROM MachineUsage WHERE OrderID = ?";
@@ -60,7 +71,9 @@ public class MachineUsageDAO {
         return usages;
     }
 
-    // DELETE MACHINE USAGE RECORD (Frees machine assignment)
+    // Deletes all machine usage records linked to an order
+    // Used to free up assigned machines when an appointment is completed or ready for pickup
+    // FOLLOWS CRUD - Update and Delete
     public boolean deleteUsageByOrder(int orderId) {
         String q = "DELETE FROM MachineUsage WHERE OrderID = ?";
         
@@ -76,39 +89,4 @@ public class MachineUsageDAO {
         }
     }
 
-    public List<MachineUsageDetail> getMachinesWithUsageDetailsByType(String machineType) {
-        List<MachineUsageDetail> list = new ArrayList<>();
-        String q = "SELECT m.MachineID, m.MachineType, m.MachineStatus, " +
-                       "mu.LaundryLoadKg, mu.OrderID, mu.LaundryDuration " +
-                       "FROM Machine m " +
-                       "LEFT JOIN MachineUsage mu ON m.MachineID = mu.MachineID " +
-                       "WHERE m.MachineType = ? " +
-                       "ORDER BY m.MachineID ASC";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement s = conn.prepareStatement(q)) {
-             
-            s.setString(1, machineType);
-            
-            try (ResultSet rs = s.executeQuery()) {
-                while (rs.next()) {
-                    int id = rs.getInt("MachineID");
-                    String type = rs.getString("MachineType");
-                    String status = rs.getString("MachineStatus");
-                    
-                    boolean isInUse = "In Use".equalsIgnoreCase(status);
-                    
-                    double load = isInUse ? rs.getDouble("LaundryLoadKg") : 0.0;
-                    int orderId = rs.getInt("OrderID");
-                    String assignedTo = (isInUse && !rs.wasNull() && orderId > 0) ? "Order #" + orderId : "None";
-                    int duration = isInUse ? rs.getInt("LaundryDuration") : 0;
-                    
-                    list.add(new MachineUsageDetail(id, type, load, assignedTo, status, duration));
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Database Error (Get Machine Details): " + e.getMessage());
-        }
-        return list;
-    }
 }
