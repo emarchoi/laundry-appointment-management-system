@@ -62,6 +62,7 @@ public class StaffLoginMenu {
                         if (loggedInStaff instanceof LaundryAttendant) {
                             AttendantMenu attendantMenu = new AttendantMenu(scanner, loggedInStaff);
                             attendantMenu.display();
+                            
                         } else if (loggedInStaff instanceof DeliveryRider) {
                             DeliveryRiderMenu deliveryRiderMenu = new DeliveryRiderMenu(scanner, loggedInStaff);
                             deliveryRiderMenu.display();
