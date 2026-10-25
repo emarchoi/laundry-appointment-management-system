@@ -677,7 +677,7 @@ public class AttendantMenu {
             String confirmInput = scanner.nextLine().trim();
 
             if ("Y".equalsIgnoreCase(confirmInput)) {
-                boolean success = appointmentDAO.deleteAllCancelledAppointments();
+                boolean success = appointmentDAO.clearCancelledAppointments();
                 System.out.println("+----------------------------------------------------+");
                 if (success) {
                     System.out.println(String.format("| %-50s |", "SUCCESS: All cancelled appointments cleared."));
