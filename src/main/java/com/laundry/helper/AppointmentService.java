@@ -1,5 +1,10 @@
 package com.laundry.helper;
 
+/*
+    The helper package contains utility classes and methods 
+    used throughout the system.
+*/
+
 import java.util.List;
 
 import com.laundry.dao.AppointmentDAO;
@@ -11,40 +16,48 @@ import com.laundry.systemclass.Payment;
 
 import java.util.Scanner;
 
+/*
+    Helper class that handles appointment logics.
+    Assembles full appointment records by fetching data from multiple DAO.
+*/
 public class AppointmentService {
 
+    // Data Access Objects for interacting with the database tables
     private AppointmentDAO appointmentDAO = new AppointmentDAO();
     private LaundryOrderDAO orderDAO = new LaundryOrderDAO();
     private PaymentDAO paymentDAO = new PaymentDAO();
 
-    // THIS IS THE METHOD THAT VIEWS THE ENTIRE APPOINTMENT
+    // Fetches a complete Appointment object including its attached laundry orders and payment info
     public Appointment getFullAppointmentDetails(String referenceNumber) {
 
-        // 1. Get the base appointment from the database
+        // First - Fetch base appointment data from database
         List<Appointment> appointments = appointmentDAO.getAppointmentsByReference(referenceNumber);
         if (appointments.isEmpty()) {
-            return null; // Appointment not found
+            return null; // If no appointments
         }
-        Appointment appt = appointments.get(0); // Assuming one active appointment per reference for now
+        Appointment appt = appointments.get(0); // Fetch the appointment from the list
 
-        // 2. Fetch all orders for this appointment and attach them
+        // Second - Fetch and attach all laundry orders from the appointment
         List<LaundryOrder> orders = orderDAO.getOrdersByAppointment(appt.getAppointmentId());
         for (LaundryOrder order : orders) {
             appt.addOrder(order);
         }
 
-        // 3. Fetch the payment details and attach them
+        // Third - Fetch and attach all laundry orders from the appointment
         Payment payment = paymentDAO.getPaymentByAppointment(appt.getAppointmentId());
         if (payment != null) {
+
             // Set the amount to be paid based on the orders' total price calculation
             payment.setAmountToBePaid(appt.getAppointmentTotalPrice());
             appt.setPayment(payment);
         }
 
-        // The Appointment object is now fully loaded with all its data!
+        // Return the complete appointment record
         return appt;
     }
 
+    // Helper validation for Weighing and Assignment
+    // Used in AttendantMenu
     public double validateWeightInput(Scanner scanner) {
 
         double weight = 0.0;
