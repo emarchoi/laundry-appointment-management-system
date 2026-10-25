@@ -41,7 +41,7 @@ public class Main {
                     break;
                 case "2":
                     System.out.println("\n-> Redirecting to Staff Login...");
-                    // Instantiation of the LoginMenu to use display()
+                    // Instantiation of the StaffLoginMenu to use display()
                     StaffLoginMenu loginMenu = new StaffLoginMenu(scanner);
                     loginMenu.display();
                     break;
