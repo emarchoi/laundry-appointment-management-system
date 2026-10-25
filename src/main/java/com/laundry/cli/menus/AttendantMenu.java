@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import com.laundry.dao.CustomerDAO;
 import com.laundry.dao.AppointmentDAO;
 import com.laundry.dao.LaundryOrderDAO;
 import com.laundry.dao.MachineDAO;
@@ -13,6 +14,7 @@ import com.laundry.dao.MachineUsageDAO;
 import com.laundry.dao.PaymentDAO;
 import com.laundry.helper.AppointmentService;
 import com.laundry.helper.MachineService;
+import com.laundry.userclass.Customer;
 import com.laundry.machineclass.Machine;
 import com.laundry.systemclass.Appointment;
 import com.laundry.systemclass.Cash;
@@ -32,6 +34,7 @@ public class AttendantMenu {
     private MachineDAO machineDAO = new MachineDAO();
     private MachineUsageDAO machineUsageDAO = new MachineUsageDAO();
     private PaymentDAO paymentDAO = new PaymentDAO();
+    private CustomerDAO customerDAO = new CustomerDAO();
 
     private AppointmentService appointmentService = new AppointmentService();
     private MachineService machineService = new MachineService();
@@ -302,10 +305,15 @@ public class AttendantMenu {
         }
 
         for (Appointment appt : allAppts) {
+            Customer customer = customerDAO.getCustomerDetails(appt.getReferenceNumber());
+            String customerName = (customer != null) ? customer.getFullName() : "N/A"; 
+
+            System.out.println("+---------------------------------------------------------------+");
+            System.out.println(String.format("| Customer : %s", customerName));
             System.out.println("+---------------------------------------------------------------+");
             System.out.println(String.format("| Appt ID: %-6d | Ref: %-9s | Status: %-12s ",
                     appt.getAppointmentId(), appt.getReferenceNumber(), appt.getAppointmentStatus()));
-            System.out.println(String.format("| Type: %-9s | ECF: %-9s | Price: PHP%-6.2f | %s",
+            System.out.println(String.format("| Type: %-9s | ECF: %-9s | Price: PHP%-5.2f | %s",
                     appt.getAppointmentType(), (appt.getECF() > 0 ? appt.getECF() + " mins" : "0 mins"),
                     appt.getAppointmentTotalPrice(), (appt.isPaid() ? "Paid" : "Pending")));
 
