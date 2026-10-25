@@ -11,9 +11,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+    Data Access Object (DAO) for managing Appointment records in the database.
+*/
 public class AppointmentDAO {
 
-    // CREATE APPOINTMENT
+    // Inserts a new Appointment record into the database
+    // Follows CRUD - Create
     public boolean createAppointment(Appointment appointment) {
         String q = "INSERT INTO Appointment (AppointmentID, ReferenceNumber, AppointmentType, "
                 + "AppointmentTotalPrice, AppointmentStatus, AppointmentDate, EstimatedCompletionFinished) "
@@ -43,6 +47,8 @@ public class AppointmentDAO {
         }
     }
 
+    // Shortcut for retrieval from the database
+    // Helper method to map a single database ResultSet row into the appointment
     private Appointment appointmentHelper(ResultSet rs) throws SQLException {
         int id = rs.getInt("AppointmentID");
         String refNum = rs.getString("ReferenceNumber");
@@ -72,6 +78,8 @@ public class AppointmentDAO {
             String pMethod = rs.getString("PaymentMethod");
             double pAmount = rs.getDouble("AmountPaid");
 
+            // Shows Polymorphism 
+            // Payment reference and DigitalPayment / Cash object
             Payment payment;
             if ("E-Payment".equalsIgnoreCase(pMethod)) {
                 payment = new DigitalPayment(paymentId, id, 0.0);
@@ -88,7 +96,9 @@ public class AppointmentDAO {
         return appt;
     }
 
-    // GET APPOINTMENTS BY REFERENCE NUMBER
+    // Fetches appointments matching a specific reference number
+    // Used by the AppointmentService to get a full details of the Appointment
+    // Follows CRUD - Read
     public List<Appointment> getAppointmentsByReference(String referenceNumber) {
         List<Appointment> appointments = new ArrayList<>();
         String q = "SELECT a.*, p.PaymentID, p.AmountPaid, p.PaymentMethod, p.PaymentStatus " +
@@ -112,9 +122,9 @@ public class AppointmentDAO {
         return appointments;
     }
 
-    // GET APPOINTMENT BY STATUS (Will mostly use in "Pending" Appointment)
-    // GET APPOINTMENTS BY STATUS (With Payment LEFT JOIN)
-    public List<Appointment> getAppointmentsByStatus(String status) {
+    // Fetches full appointments details with a Pending status
+    // Follows CRUD - Read
+    public List<Appointment> getPendingAppointments() {
         List<Appointment> appointments = new ArrayList<>();
         String q = "SELECT a.*, p.PaymentID, p.AmountPaid, p.PaymentMethod, p.PaymentStatus " +
                        "FROM Appointment a " +
@@ -122,10 +132,12 @@ public class AppointmentDAO {
                        "WHERE a.AppointmentStatus = ? " +
                        "ORDER BY a.AppointmentID DESC";
 
+        String pendStatus = "Pending";
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement s = conn.prepareStatement(q)) {
 
-            s.setString(1, status);
+            s.setString(1, pendStatus);
 
             try (ResultSet rs = s.executeQuery()) {
                 while (rs.next()) {
@@ -138,8 +150,9 @@ public class AppointmentDAO {
         return appointments;
     }
 
-    // GET ALL APPOINTMENTS
-    // GET ALL APPOINTMENTS (With Payment LEFT JOIN)
+    // Fetches full appointment details
+    // Used for retrieving all appointments in the database
+    // Follows CRUD - Read
     public List<Appointment> getAllAppointments() {
         List<Appointment> appointments = new ArrayList<>();
         String q = "SELECT a.*, p.PaymentID, p.AmountPaid, p.PaymentMethod, p.PaymentStatus " +
@@ -160,7 +173,9 @@ public class AppointmentDAO {
         return appointments;
     }
 
-    // GET DELIVERY APPOINTMENT
+    // Retrives full delivery appointment details
+    // Used in the DeliveryRider Menu
+    // Follows CRUD - Read
     public List<Appointment> getDeliveryAppointment() {
         List<Appointment> appointments = new ArrayList<>();
         String q = "SELECT a.*, p.PaymentID, p.AmountPaid, p.PaymentMethod, p.PaymentStatus " +
@@ -187,7 +202,8 @@ public class AppointmentDAO {
         return appointments;
     }
 
-    // FULL UPDATE (Used by Attendant/Rider to update Status, StaffID, Price, and ECF)
+    // Full Update (Used by Attendant/Rider to update Status, StaffID, Price, and ECF)
+    // Follows CRUD - Update
     public boolean updateAppointment(Appointment appointment) {
         String q = "UPDATE Appointment SET StaffID = ?, AppointmentStatus = ?, "
                 + "AppointmentTotalPrice = ?, EstimatedCompletionFinished = ? "
@@ -223,8 +239,10 @@ public class AppointmentDAO {
         }
     }
 
-    // 1. DELETE ALL CANCELLED APPOINTMENTS (Bulk Cleanup)
-    public boolean deleteAllCancelledAppointments() {
+    // Bulk Cleanup of Cancelled Appointments
+    // Deletion is in order based on the Foreign Key
+    // Follows CRUD - Delete
+    public boolean clearCancelledAppointments() {
         String deletePaymentSql = "DELETE FROM Payment WHERE AppointmentID IN " +
                                   "(SELECT AppointmentID FROM Appointment WHERE AppointmentStatus = 'Cancelled')";
         
