@@ -37,7 +37,7 @@ public class Appointment {
         this.estimatedCompletionFinished = 0;
     }
 
-    // Getters and Setters for DAO retrieval and insertion
+    // Getters and Setters for DAO encapsulated retrieval and insertion
     public int getAppointmentId() { return appointmentId; }
     public String getReferenceNumber() { return referenceNumber; }
     public Integer getStaffId() { return staffId; }

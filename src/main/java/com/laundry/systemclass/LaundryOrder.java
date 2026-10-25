@@ -1,5 +1,9 @@
 package com.laundry.systemclass;
 
+/*
+    Represents a laundry order item (Wash, Dry, or Wash and Dry).
+*/
+
 public class LaundryOrder {
     private int orderId;
     private int appointmentId;
@@ -8,6 +12,7 @@ public class LaundryOrder {
     private double orderTotalPrice; 
     private int machinesUsed;
 
+    // Constructors for DAO and initial values 
     public LaundryOrder(int orderId, int appointmentId, String laundryService) {
         this.orderId = orderId;
         this.appointmentId = appointmentId;
@@ -17,7 +22,7 @@ public class LaundryOrder {
         this.machinesUsed = 0;
     }
 
-    // Getters
+    // Getters and Setters for DAO encapsulated retrieval and insertion
     public int getOrderId() { return orderId; }
     public int getAppointmentId() { return appointmentId; }
     public String getLaundryService() { return laundryService; }
@@ -25,7 +30,6 @@ public class LaundryOrder {
     public double getOrderTotalPrice() { return orderTotalPrice; }
     public int getMachinesUsed() { return machinesUsed; }
 
-    // Setters
     public void setOrderId(int orderId) { this.orderId = orderId; }
     public void setAppointmentId(int appointmentId) { this.appointmentId = appointmentId; }
     public void setLaundryService(String laundryService) { this.laundryService = laundryService; }
