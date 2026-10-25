@@ -3,14 +3,21 @@ package com.laundry.helper;
 import com.laundry.dao.CustomerDAO;
 import com.laundry.userclass.Customer;
 
+/*
+    Helper class that manages customer validation and registration rules
+*/
 public class CustomerService {
+
+    // Data Access Object for database operations on customer records
     private CustomerDAO customerDAO = new CustomerDAO();
 
+    // Validates and registers a new customer into the database
     public boolean registerCustomer(Customer customer) {
         validateCustomer(customer);
         return customerDAO.addCustomer(customer);
     }
 
+    // Validate method before inserting to the database
     public void validateCustomer(Customer customer) {
         if (customer.getFirstName() == null || customer.getFirstName().trim().isEmpty()) {
             throw new IllegalArgumentException("First Name cannot be empty.");
