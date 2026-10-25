@@ -1,6 +1,10 @@
 package com.laundry.userclass;
 
 /*
+    The userclass package contains all user classes in the system.
+*/
+
+/*
     ABSTRACT CLASS showing a base user.
     Inherited by Customer and Staff classes.
 */
