@@ -10,8 +10,15 @@ import com.laundry.userclass.Customer;
 
 import java.util.List;
 import java.util.ArrayList;
+
+/*
+    Data Access Object (DAO) for managing Customer records in the database.
+*/
 public class CustomerDAO {
-    // Example CRUD Operation
+    
+    // Inserts a new customer record into the Customer database table 
+    // Used by the CustomerService
+    // Follows CRUD - Create
     public boolean addCustomer(Customer customer) {
         String q = "INSERT INTO Customer (ReferenceNumber, FirstName, LastName, PhoneNumber, Barangay, Street, BlockNo) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -35,6 +42,9 @@ public class CustomerDAO {
         }
     }
 
+    // Fetches all customer records saved in the database
+    // Used mainly in Delivery Rider Menu
+    // FOLLOWS CRUD - Read
     public Customer getCustomerDetails(String referenceNumber) {
 
         String q = "SELECT * FROM Customer "
