@@ -74,6 +74,7 @@ public class AttendantMenu {
                     break;
                 case "4":
                     clearCancelledAppointments();
+                    break;
                 case "5":
                     updateAppointmentStatus();
                     break;
@@ -296,7 +297,7 @@ public class AttendantMenu {
 
         if (allAppts.isEmpty()) {
             System.out.println("\n+---------------------------------------------------------------+");
-            System.out.println("| No appointments found in database.                          |");
+            System.out.println("| No appointments found in database.                            |");
             System.out.println("+---------------------------------------------------------------+");
         }
 
