@@ -6,9 +6,14 @@ import com.laundry.systemclass.LaundryOrder;
 import java.sql.*;
 import java.util.*;
 
+/*
+    Data Access Object (DAO) for managing LaundryOrder records in the database
+*/
 public class LaundryOrderDAO {
 
-    // 1. ADD NEW ORDER
+    // Inserts a new laundry order record into the database
+    // Used in Booking, initial order of the Customer
+    // FOLLOWS CRUD - Create
     public boolean addOrder(LaundryOrder order) {
         String q = "INSERT INTO LaundryOrder (OrderID, AppointmentID, LaundryService, "
                 + "LaundryTotalKg, OrderTotalPrice, MachinesUsed) VALUES (?, ?, ?, ?, ?, ?)";
@@ -31,7 +36,9 @@ public class LaundryOrderDAO {
         }
     }
 
-    // 2. GET ORDERS BY APPOINTMENT ID
+    // Retrieves all laundry orders linked to a specific appointment ID
+    // Used mainly to show summarized orders of an appointment
+    // FOLLOWS CRUD - Read
     public List<LaundryOrder> getOrdersByAppointment(int appointmentId) {
         List<LaundryOrder> orders = new ArrayList<>();
         String q = "SELECT * FROM LaundryOrder WHERE AppointmentID = ?";
@@ -61,7 +68,9 @@ public class LaundryOrderDAO {
         return orders;
     }
 
-    // 3. UPDATE ORDER (Used by Attendant after weighing laundry)
+    // Updates the weight, price, and machines used for a laundry order
+    // (Used by Attendant after weighing laundry)
+    // FOLLOWS CRUD - Update
     public boolean updateOrderDetails(LaundryOrder order) {
         String query = "UPDATE LaundryOrder "
                     + "SET LaundryTotalKg = ?, "
