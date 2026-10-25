@@ -6,7 +6,14 @@ import com.laundry.userclass.LaundryAttendant;
 import com.laundry.userclass.DeliveryRider;
 import java.util.Scanner;
 
+/*
+    User interface menu for staff login and authentication.
+    Verifies staff credentials with the database and routes logged-in staff 
+    to their respective role menus (Attendant or Delivery Rider).
+*/
 public class StaffLoginMenu {
+
+    // Inputs and DAO for database CRUD queries 
     private Scanner scanner;
     private StaffDAO staffDAO = new StaffDAO(); 
 
@@ -14,6 +21,7 @@ public class StaffLoginMenu {
         this.scanner = scanner;
     }
 
+    // Entry point, display loop showing UI for the Staff Login Menu
     public void display() {
         boolean inLoginMenu = true;
 
@@ -38,6 +46,8 @@ public class StaffLoginMenu {
 
             if (loginChoice.equals("1")) {
                 try {
+                    
+                    // Convert string ot int
                     int staffId = Integer.parseInt(staffIdInput);
                     
                     // Call the database to verify the login
