@@ -1,10 +1,16 @@
 package com.laundry.cli;
 
+/*
+    The cli package contains the console-based UI classes
+    used to interact with the laundry management system.
+*/
+
 import com.laundry.cli.menus.BookingMenu;
 import com.laundry.cli.menus.StaffLoginMenu;
 
 import java.util.Scanner;
 
+// Main entry point of the Laundry Appointment System
 public class Main {
 
     public static void main(String[] args) {
@@ -29,11 +35,13 @@ public class Main {
             switch (choice) {
                 case "1":
                     System.out.println("\n-> Redirecting to Booking Menu...");
+                    // Instantiation of the BookingMenu to use display()
                     BookingMenu bookingMenu = new BookingMenu(scanner);
                     bookingMenu.display();
                     break;
                 case "2":
                     System.out.println("\n-> Redirecting to Staff Login...");
+                    // Instantiation of the LoginMenu to use display()
                     StaffLoginMenu loginMenu = new StaffLoginMenu(scanner);
                     loginMenu.display();
                     break;
