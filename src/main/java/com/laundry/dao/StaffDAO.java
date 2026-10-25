@@ -5,8 +5,13 @@ import com.laundry.userclass.*;
 
 import java.sql.*;
 
+/*
+    Data Access Object (DAO) for authenticating staff members in the database
+*/
 public class StaffDAO {
 
+    // Authenticates a staff member using their Staff ID and Full Name
+    // Returns a polymorphic Staff instance (Attendant or DeliveryRider) based on their assigned role
     public Staff loginStaff(int staffId, String fullName) {
 
         String q = "SELECT * FROM Staff "
@@ -27,7 +32,7 @@ public class StaffDAO {
                     String lastName = rs.getString("LastName");
                     String staffType = rs.getString("StaffType");
 
-                    // Polymorphism
+                    // Polymorphism: Instantiate Attendant or DeliveryRider depending on StaffType value
                     if ("LaundryAttendant".equalsIgnoreCase(staffType)) {
                         return new LaundryAttendant(staffId, firstName, lastName);
                     } else if ("DeliveryRider".equalsIgnoreCase(staffType)) {
