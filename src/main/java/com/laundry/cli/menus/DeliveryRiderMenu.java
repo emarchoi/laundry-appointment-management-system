@@ -155,6 +155,13 @@ public class DeliveryRiderMenu {
             return;
         }
 
+        if ("Pending".equalsIgnoreCase(appt.getAppointmentStatus())) {
+            System.out.println("\n+----------------------------------------------------+");
+            System.out.println("| Appointment is still Pending.                      |");
+            System.out.println("+----------------------------------------------------+");
+            return;
+        }
+
         // Double Confirmation
         System.out.println("\n+----------------------------------------------------+");
         System.out.println(String.format("| Reference Number : %-31s |", appt.getReferenceNumber()));
@@ -207,6 +214,8 @@ public class DeliveryRiderMenu {
     // and automatically updates appointment status to 'Completed'
     // If customer wants to pay using QRCode, pay in the BookingMenu(viewAppointment - Pay Digital)
     private void processCashPayment() {
+
+        
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|                 PROCESS CASH PAYMENT               |");
         System.out.println("+----------------------------------------------------+");
@@ -217,10 +226,18 @@ public class DeliveryRiderMenu {
         // Only one
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
 
+        
         // Appointment - Paymetn valdiation
         if (appt == null) {
             System.out.println("\n+----------------------------------------------------+");
             System.out.println("| ERROR: Appointment not found.                      |");
+            System.out.println("+----------------------------------------------------+");
+            return;
+        }
+
+        if("In Progress".equalsIgnoreCase(appt.getAppointmentStatus()) || "Pending".equalsIgnoreCase(appt.getAppointmentStatus())) {
+            System.out.println("\n+----------------------------------------------------+");
+            System.out.println("| Cannot Process Payment yet.                        |");
             System.out.println("+----------------------------------------------------+");
             return;
         }
