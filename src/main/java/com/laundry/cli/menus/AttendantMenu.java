@@ -100,7 +100,7 @@ public class AttendantMenu {
         System.out.println("|               PENDING APPOINTMENTS LIST                 |");
         System.out.println("+---------------------------------------------------------+");
 
-        List<Appointment> pendingList = appointmentDAO.getAppointmentsByStatus("Pending");
+        List<Appointment> pendingList = appointmentDAO.getPendingAppointments();
 
         if (pendingList.isEmpty()) {
             System.out.println("| No pending appointments found.                          |");
