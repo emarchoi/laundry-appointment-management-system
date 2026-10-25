@@ -7,6 +7,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/*
+   Manages and establishes connections from here and
+   and to our MS SQL Server database.
+*/
+
 public class DatabaseConnection {
 
     private static Properties properties = new Properties();
