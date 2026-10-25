@@ -26,7 +26,7 @@ public class Appointment {
     private List<LaundryOrder> orders = new ArrayList<>();
     private Payment payment;
 
-    // Constructors for DAO and initial values 
+    // Constructors for object creation, DAO, and initial values 
     public Appointment(int appointmentId, String referenceNumber, String appointmentType, LocalDate appointmentDate) {
         this.appointmentId = appointmentId;
         this.referenceNumber = referenceNumber;

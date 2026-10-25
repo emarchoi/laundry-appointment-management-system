@@ -12,7 +12,7 @@ public class LaundryOrder {
     private double orderTotalPrice; 
     private int machinesUsed;
 
-    // Constructors for DAO and initial values 
+    // Constructors for object creation, DAO, and initial values  
     public LaundryOrder(int orderId, int appointmentId, String laundryService) {
         this.orderId = orderId;
         this.appointmentId = appointmentId;
