@@ -1,10 +1,16 @@
 package com.laundry.systemclass;
 
+/*
+    Handles digital payment verification and QR code display.
+    Inherits from Cash abtract class.
+*/
 public class DigitalPayment extends Payment implements GenerateQR {
     public DigitalPayment(int paymentId, int appointmentId, double amountToBePaid) {
         super(paymentId, appointmentId, amountToBePaid);
     }
 
+    // Implements the GenerateQR Interface.
+    // Overrides its required methods.
     @Override
     public void generateQr() {
         System.out.println("\n+-------------------------+");
@@ -23,6 +29,8 @@ public class DigitalPayment extends Payment implements GenerateQR {
         System.out.println("+-------------------------+");
     }
 
+    // Method overriding: Polymorphism
+    // Provides the implementation of the abstract method in Cash.
     @Override
     public String getPaymentMethod(){
         return "E-Payment";
