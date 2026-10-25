@@ -10,9 +10,13 @@ import com.laundry.systemclass.Cash;
 import com.laundry.systemclass.DigitalPayment;
 import com.laundry.systemclass.Payment;
 
+/*
+    Data Access Object (DAO) for managing Payment records in the database
+*/
 public class PaymentDAO {
 
-    // 1. CREATE INITIAL PAYMENT RECORD
+    // Inserts a new payment record into the database
+    // FOLLOWS CRUD - Create and Update
     public boolean createPayment(Payment payment, String paymentMethod) {
         String q = "INSERT INTO Payment (PaymentID, AppointmentID, "
                         + "AmountPaid, PaymentMethod, PaymentStatus) "
@@ -35,7 +39,9 @@ public class PaymentDAO {
         }
     }
 
-    // 2. GET PAYMENT BY APPOINTMENT ID
+    // Retrieves payment details for a specific appointment ID
+    // Used by AppointmentService to attach details to Appointment
+    // FOLLOWS CRUD - Read and Update   
     public Payment getPaymentByAppointment(int appointmentId) {
         String q = "SELECT * FROM Payment WHERE AppointmentID = ?";
         
@@ -70,25 +76,5 @@ public class PaymentDAO {
             System.err.println("Database Error (Get Payment): " + e.getMessage());
         }
         return null;
-    }
-
-    // 3. UPDATE PAYMENT STATUS (When customer pays)
-    public boolean updatePayment(Payment payment, String method) {
-        String q = "UPDATE Payment SET AmountPaid = ?, PaymentStatus = ?, PaymentMethod = ? WHERE PaymentID = ?";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement s = conn.prepareStatement(q)) {
-             
-            s.setDouble(1, payment.getAmountPaid());
-            s.setString(2, payment.getPaymentStatus());
-            s.setString(3, method);
-            s.setInt(4, payment.getPaymentId());
-            
-            return s.executeUpdate() > 0;
-            
-        } catch (SQLException e) {
-            System.err.println("Database Error (Update Payment): " + e.getMessage());
-            return false;
-        }
     }
 }
