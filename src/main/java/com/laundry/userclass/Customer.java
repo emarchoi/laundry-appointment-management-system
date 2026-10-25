@@ -1,5 +1,9 @@
 package com.laundry.userclass;
 
+/*
+    Represents a customer in the laundry system.
+    Extends the abstract User class and contains customer-specific address and contact details.
+*/
 public class Customer extends User{
 
     private String referenceNumber;
@@ -8,6 +12,7 @@ public class Customer extends User{
     private String street;
     private String blockNo;
 
+    // Constructor used for creating customer instances and mapping database records.
     public Customer(String firstName, String lastName, String referenceNumber, String phoneNumber, 
         String barangay, String street, String blockNo){
         super(firstName, lastName);
@@ -18,6 +23,7 @@ public class Customer extends User{
         this.blockNo = blockNo;
     }
 
+    // Getters and Setters for encapsulated field access by Data Access Objects (DAOs)
     public String getReferenceNumber(){ return referenceNumber; }
     public String getPhoneNumber(){ return phoneNumber; }
     public String getBarangay(){ return barangay; }
