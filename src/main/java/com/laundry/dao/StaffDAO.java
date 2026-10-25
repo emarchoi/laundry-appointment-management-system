@@ -12,6 +12,7 @@ public class StaffDAO {
 
     // Authenticates a staff member using their Staff ID and Full Name
     // Returns a polymorphic Staff instance (Attendant or DeliveryRider) based on their assigned role
+    // FOLLOWS CRUD - Read
     public Staff loginStaff(int staffId, String fullName) {
 
         String q = "SELECT * FROM Staff "
