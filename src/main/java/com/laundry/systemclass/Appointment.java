@@ -61,6 +61,11 @@ public class Appointment {
         return orders;
     }
 
+    public void addOrder(LaundryOrder order) {
+        this.orders.add(order);
+        computeAppointmentTotalPrice();
+    }
+
     // Payment Management
     public Payment getPayment() {
         return payment;
