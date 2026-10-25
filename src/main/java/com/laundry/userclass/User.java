@@ -1,6 +1,9 @@
 package com.laundry.userclass;
 
-// Abstract class: User (Inherited by Customer and Staff class)
+/*
+    ABSTRACT CLASS showing a base user.
+    Inherited by Customer and Staff classes.
+*/
 public abstract class User {
 
     private String firstName;
@@ -11,6 +14,8 @@ public abstract class User {
         this.lastName = lastName;
     }
 
+    // Getters and Setters
+    
     public String getFirstName(){ return firstName; }
     public String getLastName(){ return lastName; }
     
