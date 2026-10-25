@@ -24,11 +24,17 @@ import com.laundry.systemclass.MachineUsage;
 import com.laundry.systemclass.Payment;
 import com.laundry.userclass.Staff;
 
+/*
+    User interface menu for the Laundry Attendant role.
+    Handles weighing, machine assignments, monitoring, payments, and status updates.
+*/
 public class AttendantMenu {
 
+    // Inputs and logged-in user session
     private Scanner scanner;
     private Staff loggedInStaff;
 
+    // Database access objects (DAOs) for database CRUD queries
     private AppointmentDAO appointmentDAO = new AppointmentDAO();
     private LaundryOrderDAO orderDAO = new LaundryOrderDAO();
     private MachineDAO machineDAO = new MachineDAO();
@@ -36,14 +42,18 @@ public class AttendantMenu {
     private PaymentDAO paymentDAO = new PaymentDAO();
     private CustomerDAO customerDAO = new CustomerDAO();
 
+    // Helper classes instantiation
     private AppointmentService appointmentService = new AppointmentService();
     private MachineService machineService = new MachineService();
 
+    // Constructor initializing the Scanner and the currently logged-in Attendant
+    // Used in Main.java
     public AttendantMenu(Scanner scanner, Staff loggedInStaff) {
         this.scanner = scanner;
         this.loggedInStaff = loggedInStaff;
     }
 
+    // Entry point, display loop showing options for the Laundry Attendant
     public void display() {
         boolean inAttendantMenu = true;
 
@@ -98,11 +108,14 @@ public class AttendantMenu {
         }
     }
 
+    // Option [1]: Displays pending appointments, inputs laundry weight.
+    // Where calculation of required machines using and assigning machines happen.
     private void viewPendingAppointments() {
         System.out.println("\n+---------------------------------------------------------+");
         System.out.println("|               PENDING APPOINTMENTS LIST                 |");
         System.out.println("+---------------------------------------------------------+");
 
+        // Fetch pending appointments from database
         List<Appointment> pendingList = appointmentDAO.getPendingAppointments();
 
         if (pendingList.isEmpty()) {
@@ -111,8 +124,8 @@ public class AttendantMenu {
             return;
         }
 
+        // List each pending appointment along with its order count
         for (Appointment appt : pendingList) {
-            // Fetch the order count from LaundryOrderDAO
             int orderCount = orderDAO.getOrdersByAppointment(appt.getAppointmentId()).size();
 
             System.out.println(String.format("| Appt ID: %-3d | Ref: %-6s | %-7s | Orders: %-2d ",
@@ -129,7 +142,7 @@ public class AttendantMenu {
             return;
         }
 
-        // Full Appointment Record
+        // Retrieve full appointment record
         Appointment selectedAppt = appointmentService.getFullAppointmentDetails(refNum);
         if (selectedAppt == null || !selectedAppt.canBeCancelled()) {
             System.out.println("\n+-----------------------------------------------------+");
@@ -137,7 +150,8 @@ public class AttendantMenu {
             System.out.println("+-----------------------------------------------------+");
             return;
         }
-
+        
+        // Loop through each attached laundry order to input weight and assign machines
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|                WEIGHING & ASSIGNMENT               |");
         System.out.println("+----------------------------------------------------+");
@@ -148,25 +162,27 @@ public class AttendantMenu {
             System.out.println("+----------------------------------------------------+");
             System.out.println(String.format("| Processing Order #%-5d | Service: %-14s |", order.getOrderId(), order.getLaundryService()));
 
+            // Weigh validation from AppointmentService
             double weight = appointmentService.validateWeightInput(scanner);
 
             order.setLaundryTotalKg(weight);
 
-            // Calculate number of machines needed: CEILING(Weight / 7)
+            // Calculate number of machines needed from MachineService
             int machinesRequired = machineService.calculateMachinesRequired(weight);
             order.setMachinesUsed(machinesRequired);
 
-            // Determine machine base price
+            // Determine base price per machine according to laundry service
             double basePrice = order.getLaundryService().equalsIgnoreCase("Dry") ? 65.0 : 50.0;
             if (order.getLaundryService().equalsIgnoreCase("Wash and Dry")) {
                 basePrice = 115.0;
             }
 
+            // Calculation of order price from MachineService
             double orderPrice = machineService.calculateOrderPrice(machinesRequired, basePrice);
             order.setOrderTotalPrice(orderPrice);
             orderDAO.updateOrderDetails(order);
 
-            // Select physical machines to assign based on service type
+            // Identify required machine types based on selected service
             String service = order.getLaundryService();
             List<String> requiredTypes = new ArrayList<>();
             if (service.equalsIgnoreCase("Wash")) {
@@ -178,11 +194,13 @@ public class AttendantMenu {
                 requiredTypes.add("Dryer");
             }
 
+            // Calculation of laundryLoad per machine from MachineService
             double loadPerMachine = machineService.calculateLaundryLoad(weight, machinesRequired);
 
-            // Track machines chosen in this session to prevent double-assigning in the same prompt
+            // Track machines chosen in this session for assignment validation
             List<Integer> assignedInThisSession = new ArrayList<>();
 
+            // Prompt attendant to select available physical machines
             for (String mType : requiredTypes) {
                 System.out.println("\n+----------------------------------------------------+");
                 System.out.println(String.format("| AVAILABLE %-40s |", mType.toUpperCase() + "S"));
@@ -213,7 +231,7 @@ public class AttendantMenu {
                     int chosenMachineId = -1;
                     boolean validSelection = false;
 
-                    // Re-prompt loop for validation
+                    // Re-prompt loop for assignment validation
                     while (!validSelection) {
                         System.out.print("| Select " + mType + " ID #" + i + " to assign: ");
                         try {
@@ -252,13 +270,8 @@ public class AttendantMenu {
                     // Record assignment in this session
                     assignedInThisSession.add(chosenMachineId);
 
-                    // Create MachineUsage entry
-                    MachineUsage usage = new MachineUsage(
-                            order.getOrderId(),
-                            chosenMachineId,
-                            loadPerMachine,
-                            LocalTime.now()
-                    );
+                    // Record machine usage in database
+                    MachineUsage usage = new MachineUsage(order.getOrderId(), chosenMachineId, loadPerMachine, LocalTime.now());
                     machineUsageDAO.addMachineUsage(usage);
                     allUsagesForAppt.add(usage);
 
@@ -271,11 +284,12 @@ public class AttendantMenu {
             }
         }
 
-        // Update Appointment status and calculated total price
+        // L146
+        // Recalculate appointment total price, assign staff ID, set status to 'In Progress', and save ECF timer
         selectedAppt.computeAppointmentTotalPrice();
         selectedAppt.setStaffId(loggedInStaff.getStaffId());
         selectedAppt.setAppointmentStatus("In Progress");
-        selectedAppt.setECF(selectedAppt.getOrders().size() * 60); // 60 mins per cycle
+        selectedAppt.setECF(selectedAppt.getOrders().size() * 60);
 
         if (appointmentDAO.updateAppointment(selectedAppt)) {
             System.out.println("+----------------------------------------------------+");
@@ -289,13 +303,15 @@ public class AttendantMenu {
             System.out.println("| ERROR: Failed to update appointment status.       |");
             System.out.println("+----------------------------------------------------+");
         }
-    }
+    } // end of [1] viewPendingAppointment
 
+    // Option [2]: Displays a list of all system appointments (with complete details) and their associated orders
     private void viewAllAppointments() {
         System.out.println("\n+---------------------------------------------------------------+");
         System.out.println("|                     VIEW ALL APPOINTMENTS                     |");
         System.out.println("+---------------------------------------------------------------+");
 
+        // Retrieve all appointments in the database and store it in a list
         List<Appointment> allAppts = appointmentDAO.getAllAppointments();
 
         if (allAppts.isEmpty()) {
@@ -304,6 +320,7 @@ public class AttendantMenu {
             System.out.println("+---------------------------------------------------------------+");
         }
 
+        // Loop through each appointment and list its summary details
         for (Appointment appt : allAppts) {
             Customer customer = customerDAO.getCustomerDetails(appt.getReferenceNumber());
             String customerName = (customer != null) ? customer.getFullName() : "N/A"; 
@@ -317,7 +334,7 @@ public class AttendantMenu {
                     appt.getAppointmentType(), (appt.getECF() > 0 ? appt.getECF() + " mins" : "0 mins"),
                     appt.getAppointmentTotalPrice(), (appt.isPaid() ? "Paid" : "Pending")));
 
-            // Fetch and summary list of corresponding orders
+            // Fetch and summary list of orders corresponding to the now looped appointment
             List<LaundryOrder> orders = orderDAO.getOrdersByAppointment(appt.getAppointmentId());
             System.out.println("+---------------------------------------------------------------+");
             System.out.println("| Orders Summary:                                               |");
@@ -329,8 +346,10 @@ public class AttendantMenu {
             }
             System.out.println("+---------------------------------------------------------------+\n");
         }
-    }
+    } // end of [2] viewAllAppointments()
 
+    // Option [3]: Displays a table of physical machines (Washers/Dryers) with load, assigned order, status, and duration
+    // Also prompts to update machine status
     private void viewLaundryMachines() {
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|                VIEW LAUNDRY MACHINES               |");
@@ -353,8 +372,10 @@ public class AttendantMenu {
             return;
         }
 
+        // Fetch machine status list with full usage details
         List<MachineDAO.MachineUsageDetail> machines = machineDAO.getMachineAssignmentDetails(machineType);
 
+        // UI Headers
         System.out.println("\n+-----------------------------------------------------------------------------------+");
         System.out.println(String.format("| %-81s |", machineType.toUpperCase() + " STATUS LIST"));
         System.out.println("+-----------------------------------------------------------------------------------+");
@@ -369,31 +390,26 @@ public class AttendantMenu {
             return;
         }
 
+        // List of Machines
         for (MachineDAO.MachineUsageDetail m : machines) {
             String loadStr = m.getLaundryLoad() > 0 ? String.format("%.1f kg", m.getLaundryLoad()) : "0.0 kg";
             String durationStr = m.getDuration() > 0 ? m.getDuration() + " mins" : "0 mins";
 
             System.out.println(String.format("| %-10d | %-12s | %-15s | %-20s | %-12s |",
-                    m.getMachineId(),
-                    loadStr,
-                    m.getAssignedTo(),
-                    m.getMachineStatus(),
-                    durationStr));
+                    m.getMachineId(), loadStr, m.getAssignedTo(), m.getMachineStatus(), durationStr));
         }
         System.out.println("+-----------------------------------------------------------------------------------+");
-
+        
+        // Prompt for updating the machine status
         System.out.print("Enter Machine ID to Update Status (or 0 to exit): ");
         int machineId;
         try {
             machineId = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            return;
-        }
+        } catch (NumberFormatException e) { return; }
 
-        if (machineId == 0) {
-            return;
-        }
+        if (machineId == 0) { return; }
 
+        // Display new status selection menu
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|                  SELECT NEW STATUS                 |");
         System.out.println("+----------------------------------------------------+");
@@ -432,8 +448,52 @@ public class AttendantMenu {
             System.out.println("| ERROR: Failed to update machine status in DB.      |");
             System.out.println("+----------------------------------------------------+");
         }
-    }
+    } // end of [3] viewLaundryMachines
 
+    // Option [4]: Prompts for confirmation and bulk-deletes all cancelled appointments 
+    // along with their associated order and payment records from the database.
+    private void clearCancelledAppointments() {
+        System.out.println("\n+----------------------------------------------------+");
+        System.out.println("|        BULK DELETE ALL CANCELLED APPOINTMENTS      |");
+        System.out.println("+----------------------------------------------------+");
+        System.out.println("| WARNING: This action will permanently remove all   |");
+        System.out.println("| appointments with status 'Cancelled' and their     |");
+        System.out.println("| associated order & payment records from DB.        |");
+        System.out.println("+----------------------------------------------------+");
+
+        // Double Confirmation Loop
+        while (true) {
+            System.out.print("| Confirm bulk deletion of ALL cancelled records? (Y/N): ");
+            String confirmInput = scanner.nextLine().trim();
+
+            // Perform bulk deletion if confirmed
+            if ("Y".equalsIgnoreCase(confirmInput)) {
+                boolean success = appointmentDAO.clearCancelledAppointments();
+                System.out.println("+----------------------------------------------------+");
+                if (success) {
+                    System.out.println(String.format("| %-50s |", "SUCCESS: All cancelled appointments cleared."));
+                } else {
+                    System.out.println(String.format("| %-50s |", "NOTICE: No cancelled appointments found to clear."));
+                }
+                System.out.println("+----------------------------------------------------+");
+                break;
+
+            // Abort deletion if user chooses 'N'
+            } else if ("N".equalsIgnoreCase(confirmInput)) {
+                System.out.println("\n+----------------------------------------------------+");
+                System.out.println(String.format("| %-50s |", "Bulk clearing aborted."));
+                System.out.println("+----------------------------------------------------+");
+                break;
+            } else {
+                System.out.println("\n+----------------------------------------------------+");
+                System.out.println("| ERROR: Please enter 'Y' for Yes or 'N' for No.     |");
+                System.out.println("+----------------------------------------------------+");
+            }
+        }
+    } // end of [4] clearCancelledAppointments
+    
+    // Option [5]: Updates appointment status to 'In Progress' or 'Ready for Pickup'
+    // Automatically releases assigned machines back to 'Available' when setting 'Ready for Pickup'
     private void updateAppointmentStatus() {
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|              UPDATE APPOINTMENT STATUS             |");
@@ -441,7 +501,10 @@ public class AttendantMenu {
         System.out.print("| Enter Reference Number: ");
         String refNum = scanner.nextLine().trim();
 
+        // Retrieve an appointment based on the reference number
+        // Only update one appointment
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
+        Customer customer = customerDAO.getCustomerDetails(refNum);
 
         if (appt == null) {
             System.out.println("\n+----------------------------------------------------+");
@@ -450,12 +513,16 @@ public class AttendantMenu {
             return;
         }
 
+        // Display Details
         System.out.println("\n+----------------------------------------------------+");
+        System.out.println(String.format("| Customer Name    : %-31s |", customer.getFullName()));
+        System.out.println("+----------------------------------------------------+");
         System.out.println(String.format("| Reference Number : %-31s |", appt.getReferenceNumber()));
         System.out.println(String.format("| Current Status   : %-31s |", appt.getAppointmentStatus()));
         System.out.println(String.format("| Appointment Type : %-31s |", appt.getAppointmentType()));
         System.out.println("+----------------------------------------------------+");
 
+        // Return automatically if appointment is completed
         if (appt.getAppointmentStatus().equalsIgnoreCase("Completed")) {
             System.out.println("\n+----------------------------------------------------+");
             System.out.println("| Appointment is already completed.                  |");
@@ -463,6 +530,7 @@ public class AttendantMenu {
             return;
         }
 
+        // Prompt of new Status
         boolean validSelection = false;
 
         while (!validSelection) {
@@ -503,7 +571,7 @@ public class AttendantMenu {
                 appt.setAppointmentStatus(newStatus);
                 appt.setStaffId(loggedInStaff.getStaffId());
 
-                // Release machines & reset ECF when set to Ready for Pickup
+                // If 'Ready for Pickup', assigned machines back to 'Available' and reset ECF to 0
                 if ("Ready for Pickup".equalsIgnoreCase(newStatus)) {
                     List<LaundryOrder> orders = orderDAO.getOrdersByAppointment(appt.getAppointmentId());
                     for (LaundryOrder order : orders) {
@@ -522,6 +590,7 @@ public class AttendantMenu {
                     System.out.println("+----------------------------------------------------+");
                     System.out.println(String.format("| New Status : %-37s |", newStatus));
                     System.out.println(String.format("| Updated By : %-37s |", loggedInStaff.getFullName()));
+
                     if ("Ready for Pickup".equalsIgnoreCase(newStatus)) {
                         System.out.println(String.format("| Machines   : %-37s |", "Released to 'Available'"));
                     }
@@ -533,8 +602,10 @@ public class AttendantMenu {
                 }
             }
         }
-    }
+    } // end of Option [5]: updateAppointmentStatus
 
+    // Option [6]: Processes cash or digital payments e.g. at the Counter
+    // Marks appointment as 'Completed' upon payment success
     private void processPayment() {
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|                   PROCESS PAYMENT                  |");
@@ -542,8 +613,11 @@ public class AttendantMenu {
         System.out.print("| Enter Reference Number: ");
         String refNum = scanner.nextLine().trim();
 
+        // Retrieve an appointment based on the reference number
+        // Process only one appointment
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
 
+        // Validations
         if (appt == null) {
             System.out.println("\n+----------------------------------------------------+");
             System.out.println("| ERROR: Appointment not found.                      |");
@@ -565,13 +639,15 @@ public class AttendantMenu {
             System.out.println("+----------------------------------------------------+");
             return;
         }
+        
+        // Display Amount Due
         System.out.println("+----------------------------------------------------+");
         System.out.println(String.format("| Total Amount Due: PHP %-28.2f |", totalAmount));
         System.out.println("+----------------------------------------------------+");
 
         boolean validSelection = false;
 
-        // Validation loop keeps attendant in payment selection on invalid input
+        // Loop until a valid payment choice or cancellation is selected
         while (!validSelection) {
             System.out.println("\n+----------------------------------------------------+");
             System.out.println("| Select Payment Method:                             |");
@@ -586,6 +662,7 @@ public class AttendantMenu {
 
             int paymentId = new Random().nextInt(900000) + 100000;
 
+            // Payment validation for cash
             if ("1".equals(payChoice)) {
                 validSelection = true;
                 boolean validAmount = false;
@@ -612,6 +689,7 @@ public class AttendantMenu {
                     }
                 }
 
+                // Create Payment/ Cash Payment Instantiation (Polymorphism) and update the Database
                 double change = amountPd - totalAmount;
                 Payment payment = new Cash(paymentId, appt.getAppointmentId(), totalAmount);
                 payment.setAmountPaid(amountPd);
@@ -634,7 +712,8 @@ public class AttendantMenu {
                     System.out.println("| ERROR: Could not record payment in database.       |");
                     System.out.println("+----------------------------------------------------+");
                 }
-
+            
+            // Create Payment/ Digital Payment Instantiation (Polymorphism) and update the Database
             } else if ("2".equals(payChoice)) {
                 validSelection = true;
                 Payment payment = new DigitalPayment(paymentId, appt.getAppointmentId(), totalAmount);
@@ -667,43 +746,5 @@ public class AttendantMenu {
                 System.out.println("+----------------------------------------------------+");
             }
         }
-    }
-
-    // CRUD - Delete
-    private void clearCancelledAppointments() {
-        System.out.println("\n+----------------------------------------------------+");
-        System.out.println("|        BULK DELETE ALL CANCELLED APPOINTMENTS      |");
-        System.out.println("+----------------------------------------------------+");
-        System.out.println("| WARNING: This action will permanently remove all   |");
-        System.out.println("| appointments with status 'Cancelled' and their     |");
-        System.out.println("| associated order & payment records from DB.        |");
-        System.out.println("+----------------------------------------------------+");
-
-        // Double Confirmation Loop
-        while (true) {
-            System.out.print("| Confirm bulk deletion of ALL cancelled records? (Y/N): ");
-            String confirmInput = scanner.nextLine().trim();
-
-            if ("Y".equalsIgnoreCase(confirmInput)) {
-                boolean success = appointmentDAO.clearCancelledAppointments();
-                System.out.println("+----------------------------------------------------+");
-                if (success) {
-                    System.out.println(String.format("| %-50s |", "SUCCESS: All cancelled appointments cleared."));
-                } else {
-                    System.out.println(String.format("| %-50s |", "NOTICE: No cancelled appointments found to clear."));
-                }
-                System.out.println("+----------------------------------------------------+");
-                break;
-            } else if ("N".equalsIgnoreCase(confirmInput)) {
-                System.out.println("\n+----------------------------------------------------+");
-                System.out.println(String.format("| %-50s |", "Bulk clearing aborted."));
-                System.out.println("+----------------------------------------------------+");
-                break;
-            } else {
-                System.out.println("\n+----------------------------------------------------+");
-                System.out.println("| ERROR: Please enter 'Y' for Yes or 'N' for No.     |");
-                System.out.println("+----------------------------------------------------+");
-            }
-        }
-    }
+    } // end of Option [6] : processPayment()
 }
