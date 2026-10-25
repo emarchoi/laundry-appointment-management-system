@@ -51,9 +51,10 @@ public class AttendantMenu {
             System.out.println("|  [1] VIEW PENDING APPOINTMENTS                     |");
             System.out.println("|  [2] VIEW ALL APPOINTMENTS                         |");
             System.out.println("|  [3] VIEW LAUNDRY MACHINES                         |");
+            System.out.println("|  [4] CLEAR CANCELLED APPOINTMENTS                  |");
             System.out.println("+----------------------------------------------------+");
-            System.out.println("|  [4] UPDATE APPOINTMENT STATUS                     |");
-            System.out.println("|  [5] PROCESS PAYMENT                               |");
+            System.out.println("|  [5] UPDATE APPOINTMENT STATUS                     |");
+            System.out.println("|  [6] PROCESS PAYMENT                               |");
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [0] LOGOUT                                        |");
             System.out.println("+----------------------------------------------------+");
@@ -72,9 +73,11 @@ public class AttendantMenu {
                     viewLaundryMachines();
                     break;
                 case "4":
+                    clearCancelledAppointments();
+                case "5":
                     updateAppointmentStatus();
                     break;
-                case "5":
+                case "6":
                     processPayment();
                     break;
                 case "0":
@@ -652,6 +655,44 @@ public class AttendantMenu {
             } else {
                 System.out.println("+----------------------------------------------------+");
                 System.out.println("| Invalid payment method selected. Please try again. |");
+                System.out.println("+----------------------------------------------------+");
+            }
+        }
+    }
+
+    // CRUD - Delete
+    private void clearCancelledAppointments() {
+        System.out.println("\n+----------------------------------------------------+");
+        System.out.println("|        BULK DELETE ALL CANCELLED APPOINTMENTS      |");
+        System.out.println("+----------------------------------------------------+");
+        System.out.println("| WARNING: This action will permanently remove all   |");
+        System.out.println("| appointments with status 'Cancelled' and their     |");
+        System.out.println("| associated order & payment records from DB.        |");
+        System.out.println("+----------------------------------------------------+");
+
+        // Double Confirmation Loop
+        while (true) {
+            System.out.print("| Confirm bulk deletion of ALL cancelled records? (Y/N): ");
+            String confirmInput = scanner.nextLine().trim();
+
+            if ("Y".equalsIgnoreCase(confirmInput)) {
+                boolean success = appointmentDAO.deleteAllCancelledAppointments();
+                System.out.println("+----------------------------------------------------+");
+                if (success) {
+                    System.out.println(String.format("| %-50s |", "SUCCESS: All cancelled appointments cleared."));
+                } else {
+                    System.out.println(String.format("| %-50s |", "NOTICE: No cancelled appointments found to clear."));
+                }
+                System.out.println("+----------------------------------------------------+");
+                break;
+            } else if ("N".equalsIgnoreCase(confirmInput)) {
+                System.out.println("\n+----------------------------------------------------+");
+                System.out.println(String.format("| %-50s |", "Bulk clearing aborted."));
+                System.out.println("+----------------------------------------------------+");
+                break;
+            } else {
+                System.out.println("\n+----------------------------------------------------+");
+                System.out.println("| ERROR: Please enter 'Y' for Yes or 'N' for No.     |");
                 System.out.println("+----------------------------------------------------+");
             }
         }

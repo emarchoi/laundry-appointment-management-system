@@ -222,4 +222,44 @@ public class AppointmentDAO {
             return false;
         }
     }
+
+    // 1. DELETE ALL CANCELLED APPOINTMENTS (Bulk Cleanup)
+    public boolean deleteAllCancelledAppointments() {
+        String deletePaymentSql = "DELETE FROM Payment WHERE AppointmentID IN " +
+                                  "(SELECT AppointmentID FROM Appointment WHERE AppointmentStatus = 'Cancelled')";
+        
+        String deleteUsageSql   = "DELETE FROM MachineUsage WHERE OrderID IN " +
+                                  "(SELECT OrderID FROM LaundryOrder WHERE AppointmentID IN " +
+                                  "(SELECT AppointmentID FROM Appointment WHERE AppointmentStatus = 'Cancelled'))";
+        
+        String deleteOrdersSql  = "DELETE FROM LaundryOrder WHERE AppointmentID IN " +
+                                  "(SELECT AppointmentID FROM Appointment WHERE AppointmentStatus = 'Cancelled')";
+        
+        String deleteApptSql    = "DELETE FROM Appointment WHERE AppointmentStatus = 'Cancelled'";
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            conn.setAutoCommit(false); 
+
+            try (PreparedStatement s1 = conn.prepareStatement(deletePaymentSql);
+                 PreparedStatement s2 = conn.prepareStatement(deleteUsageSql);
+                 PreparedStatement s3 = conn.prepareStatement(deleteOrdersSql);
+                 PreparedStatement s4 = conn.prepareStatement(deleteApptSql)) {
+
+                s1.executeUpdate();
+                s2.executeUpdate();
+                s3.executeUpdate();
+                int rowsDeleted = s4.executeUpdate();
+
+                conn.commit(); 
+                return rowsDeleted > 0;
+            } catch (SQLException e) {
+                conn.rollback(); 
+                System.err.println("Database Error (Rollback Delete Cancelled): " + e.getMessage());
+                return false;
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Error (Delete Cancelled Appointments): " + e.getMessage());
+            return false;
+        }
+    }
 }
