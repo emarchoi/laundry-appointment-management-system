@@ -477,7 +477,6 @@ public class AttendantMenu {
                 }
                 System.out.println("+----------------------------------------------------+");
                 break;
-
             // Abort deletion if user chooses 'N'
             } else if ("N".equalsIgnoreCase(confirmInput)) {
                 System.out.println("\n+----------------------------------------------------+");
