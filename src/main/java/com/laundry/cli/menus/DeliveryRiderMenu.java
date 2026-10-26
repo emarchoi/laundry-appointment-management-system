@@ -56,7 +56,7 @@ public class DeliveryRiderMenu {
             System.out.println(String.format("| %-50s |", "DELIVERY RIDER MENU - Welcome, " + loggedInRider.getFullName()));
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [1] VIEW DELIVERY APPOINTMENTS                    |");
-            System.out.println("|  [2] UPDATE STATUS : OUT FOR DELIVERY              |");
+            System.out.println("|  [2] UPDATE STATUS                                 |");
             System.out.println("|  [3] PROCESS CASH PAYMENT                          |");
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [0] LOGOUT                                        |");
@@ -70,7 +70,7 @@ public class DeliveryRiderMenu {
                     viewDeliveryAppointments();
                     break;
                 case "2":
-                    updateOutForDeliveryStatus();
+                    updateDeliveryStatus();
                     break;
                 case "3":
                     processCashPayment();
@@ -135,17 +135,18 @@ public class DeliveryRiderMenu {
         }
     } // end of [1] : viewDeliveryAppointments
 
-    // Option [2]: Updates delivery appointment status to 'Out for Delivery'
-    // Releases assigned machines back to 'Available' and clears the ECF timer
-    private void updateOutForDeliveryStatus() {
+    // Option [2]: Updates delivery appointment status to 'Out for Delivery' or 'Completed'
+    // 'Out for Delivery': releases assigned machines back to 'Available' and clears the ECF timer
+    // 'Completed': only allowed once the appointment is already 'Out for Delivery'
+    private void updateDeliveryStatus() {
         System.out.println("\n+----------------------------------------------------+");
-        System.out.println("|       UPDATE STATUS : OUT FOR DELIVERY             |");
+        System.out.println("|       UPDATE STATUS : DELIVERY APPOINTMENT         |");
         System.out.println("+----------------------------------------------------+");
         System.out.print("| Enter Reference Number: ");
         String refNum = scanner.nextLine().trim();
 
         // Retrieve full appointment record of refnum
-        // Onle one appointment
+        // Only one appointment
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
 
         if (appt == null || !"Delivery".equalsIgnoreCase(appt.getAppointmentType())) {
@@ -162,41 +163,97 @@ public class DeliveryRiderMenu {
             return;
         }
 
-        // Double Confirmation
+        // Already finished, nothing left to update
+        if ("Completed".equalsIgnoreCase(appt.getAppointmentStatus())) {
+            System.out.println("\n+----------------------------------------------------+");
+            System.out.println("| Appointment is already Completed.                  |");
+            System.out.println("+----------------------------------------------------+");
+            return;
+        }
+
+        // Choose the new status
         System.out.println("\n+----------------------------------------------------+");
         System.out.println(String.format("| Reference Number : %-31s |", appt.getReferenceNumber()));
         System.out.println(String.format("| Current Status   : %-31s |", appt.getAppointmentStatus()));
         System.out.println("+----------------------------------------------------+");
-        System.out.println("| Set status to 'Out for Delivery'?                  |");
-        System.out.println("|  [1] Yes                                           |");
+        System.out.println("| Set status to:                                     |");
+        System.out.println("+----------------------------------------------------+");
+        System.out.println("|  [1] Out for Delivery                              |");
+        System.out.println("|  [2] Completed                                     |");
         System.out.println("|  [0] Cancel                                        |");
         System.out.println("+----------------------------------------------------+");
         System.out.print("SELECT OPTION: ");
         String choice = scanner.nextLine().trim();
+
+        String newStatus;
         if ("1".equals(choice)) {
-            appt.setAppointmentStatus("Out for Delivery");
+            newStatus = "Out for Delivery";
+        } else if ("2".equals(choice)) {
+            newStatus = "Completed";
+        } else {
+            System.out.println("\n+----------------------------------------------------+");
+            System.out.println("| Operation cancelled. Returning to menu.            |");
+            System.out.println("+----------------------------------------------------+");
+            return;
+        }
+
+        // Completed can only follow Out for Delivery
+        if ("Completed".equals(newStatus) && !"Out for Delivery".equalsIgnoreCase(appt.getAppointmentStatus())) {
+            System.out.println("\n+----------------------------------------------------+");
+            System.out.println("| ERROR: Must be 'Out for Delivery' before Completed.|");
+            System.out.println("+----------------------------------------------------+");
+            return;
+        }
+
+        // Already Out for Delivery, machines were released earlier
+        if ("Out for Delivery".equals(newStatus) && "Out for Delivery".equalsIgnoreCase(appt.getAppointmentStatus())) {
+            System.out.println("\n+----------------------------------------------------+");
+            System.out.println("| Appointment is already Out for Delivery.           |");
+            System.out.println("+----------------------------------------------------+");
+            return;
+        }
+
+        // Double Confirmation
+        System.out.println("\n+----------------------------------------------------+");
+        System.out.println(String.format("| Confirm status change to '%s'?", newStatus));
+        System.out.println("+----------------------------------------------------+");
+        System.out.println("|  [1] Yes                                           |");
+        System.out.println("|  [0] Cancel                                        |");
+        System.out.println("+----------------------------------------------------+");
+        System.out.print("SELECT OPTION: ");
+        String confirm = scanner.nextLine().trim();
+
+        if ("1".equals(confirm)) {
+            appt.setAppointmentStatus(newStatus);
             appt.setStaffId(loggedInRider.getStaffId());
 
-            // Release assigned machines back to 'Available', delete usage records, and reset ECF timer
-            List<LaundryOrder> orders = orderDAO.getOrdersByAppointment(appt.getAppointmentId());
-            
-            for (LaundryOrder order : orders) {
-                List<MachineUsage> usages = machineUsageDAO.getUsageByOrder(order.getOrderId());
-                for (MachineUsage usage : usages) {
-                    machineDAO.updateMachineStatus(usage.getMachineId(), "Available");
+            boolean machinesReleased = false;
+
+            if ("Out for Delivery".equals(newStatus)) {
+                // Release assigned machines back to 'Available', delete usage records, and reset ECF timer
+                List<LaundryOrder> orders = orderDAO.getOrdersByAppointment(appt.getAppointmentId());
+
+                for (LaundryOrder order : orders) {
+                    List<MachineUsage> usages = machineUsageDAO.getUsageByOrder(order.getOrderId());
+                    for (MachineUsage usage : usages) {
+                        machineDAO.updateMachineStatus(usage.getMachineId(), "Available");
+                    }
+                    machineUsageDAO.deleteUsageByOrder(order.getOrderId());
                 }
-                machineUsageDAO.deleteUsageByOrder(order.getOrderId());
+                appt.setECF(0);
+                machinesReleased = true;
             }
-            appt.setECF(0);
 
             // Save status update to database
             if (appointmentDAO.updateAppointment(appt)) {
                 System.out.println("\n+----------------------------------------------------+");
                 System.out.println("|            STATUS UPDATED SUCCESSFULLY!            |");
                 System.out.println("+----------------------------------------------------+");
-                System.out.println(String.format("| New Status : %-37s |", "Out for Delivery"));
+                System.out.println(String.format("| New Status : %-37s |", newStatus));
                 System.out.println(String.format("| Updated By : %-37s |", loggedInRider.getFullName()));
-                System.out.println(String.format("| Machines   : %-37s |", "Released to 'Available'"));
+                if (machinesReleased) {
+                    System.out.println(String.format("| Machines   : %-37s |", "Released to 'Available'"));
+                }
                 System.out.println("+----------------------------------------------------+");
             } else {
                 System.out.println("\n+----------------------------------------------------+");
@@ -208,7 +265,7 @@ public class DeliveryRiderMenu {
             System.out.println("| Operation cancelled. Returning to menu.            |");
             System.out.println("+----------------------------------------------------+");
         }
-    } // end [2] : updateStatus
+    } // end [2] : updateDeliveryStatus
 
     // Option [3]: Collects cash payment upon delivery, computes change, 
     // and automatically updates appointment status to 'Completed'
