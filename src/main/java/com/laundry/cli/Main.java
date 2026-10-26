@@ -21,7 +21,7 @@ public class Main {
 
         while (isRunning) {
             System.out.println("\n+----------------------------------------------------+");
-            System.out.println("|            LAUNDRY APPOINTMENT SYSTEM              |");
+            System.out.println("|                     QUICK RINSE                    |");
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [1] BOOK APPOINTMENT                              |");
             System.out.println("|  [2] STAFF LOG IN                                  |");

@@ -49,7 +49,7 @@ public class BookingMenu {
 
         while (inBookingMenu) {
             System.out.println("\n+----------------------------------------------------+");
-            System.out.println("|            LAUNDRY APPOINTMENT SYSTEM              |");
+            System.out.println("|      QUICK RINSE | LAUNDRY APPOINTMENT SYSTEM      |");
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [1] CREATE APPOINTMENT                            |");
             System.out.println("|  [2] VIEW APPOINTMENT                              |");
