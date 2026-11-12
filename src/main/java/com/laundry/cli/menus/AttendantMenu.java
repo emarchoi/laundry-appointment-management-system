@@ -352,6 +352,39 @@ public class AttendantMenu {
 
         System.out.println("+---------------------------------------------------------------------------------------------------------------------------------------+");
 
+        System.out.println("\n+-------------------------------------------------------------------------------------------------------------------------------+");
+        System.out.println("|                                                          ORDERS LIST                                                           |");
+        System.out.println("+-------------------------------------------------------------------------------------------------------------------------------+");
+
+        System.out.println(String.format(
+                "| %-20s | %-8s | %-10s | %-10s | %-15s | %-10s | %-12s |",
+                "Customer", "Appt. ID", "Ref. Num", "Order ID", "Service", "Weight", "Price"
+        ));
+
+        System.out.println("+-------------------------------------------------------------------------------------------------------------------------------+");
+
+        for (Appointment appt : allAppts) {
+            Customer customer = customerDAO.getCustomerDetails(appt.getReferenceNumber());
+            String customerName = (customer != null) ? customer.getFullName() : "N/A";
+
+            List<LaundryOrder> orders = orderDAO.getOrdersByAppointment(appt.getAppointmentId());
+
+            for (LaundryOrder order : orders) {
+                System.out.println(String.format(
+                        "| %-20s | %-8d | %-10s | %-10d | %-15s | %-10.1f | %-12.2f |",
+                        customerName,
+                        appt.getAppointmentId(),
+                        appt.getReferenceNumber(),
+                        order.getOrderId(),
+                        order.getLaundryService(),
+                        order.getLaundryTotalKg(),
+                        order.getOrderTotalPrice()
+                ));
+            }
+        }
+
+        System.out.println("+-------------------------------------------------------------------------------------------------------------------------------+");
+
     } // end of [2] viewAllAppointments()
 
     // Option [3]: Displays a table of physical machines (Washers/Dryers) with load, assigned order, status, and duration
