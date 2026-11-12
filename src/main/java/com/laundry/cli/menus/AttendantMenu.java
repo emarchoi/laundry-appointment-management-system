@@ -126,7 +126,7 @@ public class AttendantMenu {
 
         // List each pending appointment along with its order count
         System.out.println("+--------------------------------------------------------------------------+");
-        System.out.printf("| %-20s | %-8s | %-10s | %-6s |%n",
+        System.out.printf("| %-17s | %-8s | %-12s | %-9s |%n",
                 "Customer Name", "Appt. ID", "Ref. Num.", "Orders");
         System.out.println("+--------------------------------------------------------------------------+");
 
@@ -134,7 +134,7 @@ public class AttendantMenu {
             int orderCount = orderDAO.getOrdersByAppointment(appt.getAppointmentId()).size();
             Customer customer = customerDAO.getCustomerDetails(appt.getReferenceNumber());
 
-            System.out.printf("| %-20s | %-8d | %-10s | %-6d |%n",
+            System.out.printf("| %-17s | %-8d | %-12s | %-9d |%n",
                     customer.getFullName(),
                     appt.getAppointmentId(),
                     appt.getReferenceNumber(),
