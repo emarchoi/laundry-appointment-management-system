@@ -125,10 +125,10 @@ public class AttendantMenu {
         }
 
         // List each pending appointment along with its order count
-        System.out.println("+--------------------------------------------------------------------------+");
+        System.out.println("+---------------------------------------------------------+");
         System.out.printf("| %-17s | %-8s | %-12s | %-9s |%n",
                 "Customer Name", "Appt. ID", "Ref. Num.", "Orders");
-        System.out.println("+--------------------------------------------------------------------------+");
+        System.out.println("+---------------------------------------------------------+");
 
         for (Appointment appt : pendingList) {
             int orderCount = orderDAO.getOrdersByAppointment(appt.getAppointmentId()).size();
@@ -141,7 +141,7 @@ public class AttendantMenu {
                     orderCount);
         }
 
-        System.out.println("+--------------------------------------------------------------------------+");
+        System.out.println("+---------------------------------------------------------+");
         System.out.print("Enter Reference Number to Process (or 0 to exit): ");
         String refNum = scanner.nextLine();
 
