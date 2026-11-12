@@ -514,7 +514,8 @@ public class AttendantMenu {
             System.out.println("+----------------------------------------------------+");
             return;
         }
-        
+
+        // Necessary retrieval
         Customer customer = customerDAO.getCustomerDetails(refNum);
         Payment payment = paymentDAO.getPaymentByAppointment(appt.getAppointmentId());
 
