@@ -27,7 +27,7 @@ import com.laundry.userclass.Staff;
 /*
     User interface menu for the Laundry Attendant role.
     Handles weighing, machine assignments, monitoring, payments, and status updates.
-*/
+ */
 public class AttendantMenu {
 
     // Inputs and logged-in user session
@@ -129,10 +129,10 @@ public class AttendantMenu {
             int orderCount = orderDAO.getOrdersByAppointment(appt.getAppointmentId()).size();
 
             System.out.println(String.format("| Appt ID: %-3d | Ref: %-6s | %-7s | Orders: %-2d ",
-                appt.getAppointmentId(),
-                appt.getReferenceNumber(),
-                appt.getAppointmentType(),
-                orderCount));
+                    appt.getAppointmentId(),
+                    appt.getReferenceNumber(),
+                    appt.getAppointmentType(),
+                    orderCount));
         }
         System.out.println("+---------------------------------------------------------+");
         System.out.print("Enter Reference Number to Process (or 0 to exit): ");
@@ -150,7 +150,7 @@ public class AttendantMenu {
             System.out.println("+-----------------------------------------------------+");
             return;
         }
-        
+
         // Loop through each attached laundry order to input weight and assign machines
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|                WEIGHING & ASSIGNMENT               |");
@@ -186,10 +186,10 @@ public class AttendantMenu {
             String service = order.getLaundryService();
             List<String> requiredTypes = new ArrayList<>();
             if (service.equalsIgnoreCase("Wash")) {
-                requiredTypes.add("Washer"); 
-            }else if (service.equalsIgnoreCase("Dry")) {
-                requiredTypes.add("Dryer"); 
-            }else if (service.equalsIgnoreCase("Wash and Dry")) {
+                requiredTypes.add("Washer");
+            } else if (service.equalsIgnoreCase("Dry")) {
+                requiredTypes.add("Dryer");
+            } else if (service.equalsIgnoreCase("Wash and Dry")) {
                 requiredTypes.add("Washer");
                 requiredTypes.add("Dryer");
             }
@@ -323,7 +323,7 @@ public class AttendantMenu {
         // Loop through each appointment and list its summary details
         for (Appointment appt : allAppts) {
             Customer customer = customerDAO.getCustomerDetails(appt.getReferenceNumber());
-            String customerName = (customer != null) ? customer.getFullName() : "N/A"; 
+            String customerName = (customer != null) ? customer.getFullName() : "N/A";
 
             System.out.println("+---------------------------------------------------------------+");
             System.out.println(String.format("| Customer : %s", customerName));
@@ -399,15 +399,19 @@ public class AttendantMenu {
                     m.getMachineId(), loadStr, m.getAssignedTo(), m.getMachineStatus(), durationStr));
         }
         System.out.println("+-----------------------------------------------------------------------------------+");
-        
+
         // Prompt for updating the machine status
         System.out.print("Enter Machine ID to Update Status (or 0 to exit): ");
         int machineId;
         try {
             machineId = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) { return; }
+        } catch (NumberFormatException e) {
+            return;
+        }
 
-        if (machineId == 0) { return; }
+        if (machineId == 0) {
+            return;
+        }
 
         // Display new status selection menu
         System.out.println("\n+----------------------------------------------------+");
@@ -477,7 +481,7 @@ public class AttendantMenu {
                 }
                 System.out.println("+----------------------------------------------------+");
                 break;
-            // Abort deletion if user chooses 'N'
+                // Abort deletion if user chooses 'N'
             } else if ("N".equalsIgnoreCase(confirmInput)) {
                 System.out.println("\n+----------------------------------------------------+");
                 System.out.println(String.format("| %-50s |", "Bulk clearing aborted."));
@@ -490,7 +494,7 @@ public class AttendantMenu {
             }
         }
     } // end of [4] clearCancelledAppointments
-    
+
     // Option [5]: Updates appointment status to 'In Progress' or 'Ready for Pickup'
     // Automatically releases assigned machines back to 'Available' when setting 'Ready for Pickup'
     private void updateAppointmentStatus() {
@@ -504,6 +508,7 @@ public class AttendantMenu {
         // Only update one appointment
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
         Customer customer = customerDAO.getCustomerDetails(refNum);
+        Payment payment = paymentDAO.getPaymentByAppointment(appt.getAppointmentId());
 
         if (appt == null) {
             System.out.println("\n+----------------------------------------------------+");
@@ -536,8 +541,9 @@ public class AttendantMenu {
             System.out.println("+----------------------------------------------------+");
             System.out.println("| Select New Status:                                 |");
             System.out.println("+----------------------------------------------------+");
-            System.out.println("|  [1] In Progress                                   |");
-            System.out.println("|  [2] Ready for Pickup                              |");
+            System.out.println("|  [1] Completed                                     |");
+            System.out.println("|  [2] In Progress                                   |");
+            System.out.println("|  [3] Ready for Pickup                              |");
             System.out.println("+----------------------------------------------------+");
             System.out.println("|  [0] Cancel                                        |");
             System.out.println("+----------------------------------------------------+");
@@ -548,11 +554,17 @@ public class AttendantMenu {
 
             switch (choice) {
                 case "1":
-                    newStatus = "In Progress";
+                    if (!payment.getPaymentStatus().equalsIgnoreCase("Paid")) {
+                        System.out.println("\n+----------------------------------------------------+");
+                        System.out.println("| Appointment must be Paid first.                    |");
+                        System.out.println("+----------------------------------------------------+");
+                        return;
+                    }
+                    newStatus = "Completed";
                     validSelection = true;
                     break;
                 case "2":
-                    newStatus = "Ready for Pickup";
+                    newStatus = "In Progress";
                     validSelection = true;
                     break;
                 case "0":
@@ -638,7 +650,7 @@ public class AttendantMenu {
             System.out.println("+----------------------------------------------------+");
             return;
         }
-        
+
         // Display Amount Due
         System.out.println("+----------------------------------------------------+");
         System.out.println(String.format("| Total Amount Due: PHP %-28.2f |", totalAmount));
@@ -697,7 +709,7 @@ public class AttendantMenu {
                 if (paymentDAO.createPayment(payment, "Cash")) {
                     appt.setPayment(payment);
 
-                    if(!"In Progress".equalsIgnoreCase(appt.getAppointmentStatus())) {
+                    if (!"In Progress".equalsIgnoreCase(appt.getAppointmentStatus())) {
                         appt.setAppointmentStatus("Completed");
                     }
                     appointmentDAO.updateAppointment(appt);
@@ -714,8 +726,8 @@ public class AttendantMenu {
                     System.out.println("| ERROR: Could not record payment in database.       |");
                     System.out.println("+----------------------------------------------------+");
                 }
-            
-            // Create Payment/ Digital Payment Instantiation (Polymorphism) and update the Database
+
+                // Create Payment/ Digital Payment Instantiation (Polymorphism) and update the Database
             } else if ("2".equals(payChoice)) {
                 validSelection = true;
                 Payment payment = new DigitalPayment(paymentId, appt.getAppointmentId(), totalAmount);
@@ -725,7 +737,7 @@ public class AttendantMenu {
                 if (paymentDAO.createPayment(payment, "E-Payment")) {
                     appt.setPayment(payment);
 
-                    if(!"In Progress".equalsIgnoreCase(appt.getAppointmentStatus())) {
+                    if (!"In Progress".equalsIgnoreCase(appt.getAppointmentStatus())) {
                         appt.setAppointmentStatus("Completed");
                     }
                     appointmentDAO.updateAppointment(appt);
