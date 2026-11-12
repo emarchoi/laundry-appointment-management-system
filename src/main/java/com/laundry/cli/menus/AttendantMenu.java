@@ -313,8 +313,8 @@ public class AttendantMenu {
     // Option [2]: Displays a list of all system appointments (with complete details) and their associated orders
     private void viewAllAppointments() {
 
-        System.out.println("+---------------------------------------------------------------------------------------------------------------------------------------------+");
-        System.out.println("|                                                          VIEW ALL APPOINTMENTS                                                              |");
+        System.out.println("\n+---------------------------------------------------------------------------------------------------------------------------------------------+");
+        System.out.println("|                                                       VIEW ALL APPOINTMENTS                                                                 |");
         System.out.println("+---------------------------------------------------------------------------------------------------------------------------------------------+");
 
         List<Appointment> allAppts = appointmentDAO.getAllAppointments();
@@ -355,16 +355,16 @@ public class AttendantMenu {
 
         System.out.println("+---------------------------------------------------------------------------------------------------------------------------------------------+");
 
-        System.out.println("\n+-------------------------------------------------------------------------------------------------------------------------------+");
-        System.out.println("|                                                          ORDERS LIST                                                           |");
-        System.out.println("+-------------------------------------------------------------------------------------------------------------------------------+");
+        System.out.println("\n+---------------------------------------------------------------------------------------------------------+");
+        System.out.println("|                                            ALL ORDERS LIST                                              |");
+        System.out.println("+---------------------------------------------------------------------------------------------------------+");
 
         System.out.println(String.format(
                 "| %-20s | %-8s | %-10s | %-10s | %-15s | %-10s | %-12s |",
                 "Customer", "Appt. ID", "Ref. Num", "Order ID", "Service", "Weight", "Price"
         ));
 
-        System.out.println("+-------------------------------------------------------------------------------------------------------------------------------+");
+        System.out.println("+---------------------------------------------------------------------------------------------------------+");
 
         for (Appointment appt : allAppts) {
             Customer customer = customerDAO.getCustomerDetails(appt.getReferenceNumber());
@@ -374,19 +374,20 @@ public class AttendantMenu {
 
             for (LaundryOrder order : orders) {
                 System.out.println(String.format(
-                        "| %-20s | %-8d | %-10s | %-10d | %-15s | %-10.1f | %-12.2f |",
+                        "| %-20s | %-8d | %-10s | %-10d | %-15s | %.1f kg %-3s | PHP %-8.2f |",
                         customerName,
                         appt.getAppointmentId(),
                         appt.getReferenceNumber(),
                         order.getOrderId(),
                         order.getLaundryService(),
                         order.getLaundryTotalKg(),
+                        "",
                         order.getOrderTotalPrice()
                 ));
             }
         }
 
-        System.out.println("+-------------------------------------------------------------------------------------------------------------------------------+");
+        System.out.println("+---------------------------------------------------------------------------------------------------------+");
 
     } // end of [2] viewAllAppointments()
 
