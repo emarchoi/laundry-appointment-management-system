@@ -1,5 +1,9 @@
 package com.laundry.cli.menus;
 
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
+
 import com.laundry.dao.AppointmentDAO;
 import com.laundry.dao.CustomerDAO;
 import com.laundry.dao.LaundryOrderDAO;
@@ -14,10 +18,6 @@ import com.laundry.systemclass.MachineUsage;
 import com.laundry.systemclass.Payment;
 import com.laundry.userclass.Customer;
 import com.laundry.userclass.Staff;
-
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
 
 /*
     User interface menu for the Delivery Rider role.
@@ -117,12 +117,12 @@ public class DeliveryRiderMenu {
             String fullAddress = barangay + ", " + street + ", " + blkNo;
 
             String payStatus = appt.isPaid() ? "Paid" : "Pending";
-            String priceStr = String.format("PHP%.2f", appt.getAppointmentTotalPrice());
+            String priceStr = String.format("PHP %.2f", appt.getAppointmentTotalPrice());
 
             System.out.println("+--------------------------------------------------------------+");
-            System.out.println(String.format("| %-6s | %-9s | %-16s | %-10s | %-7s |", "ID", "Ref Num", "Status", "Price", "Payment"));
+            System.out.println(String.format("| %-6s | %-9s | %-13s | %-10s | %-8s |", "Appt. ID", "Ref. Num.", "Status", "Price", "Payment"));
             System.out.println("+--------------------------------------------------------------+");
-            System.out.println(String.format("| %-6d | %-9s | %-16s | %-10s | %-7s |",
+            System.out.println(String.format("| %-8d | %-9s | %-13s | %-10s | %-8s |",
                     appt.getAppointmentId(), appt.getReferenceNumber(), appt.getAppointmentStatus(), priceStr, payStatus));
 
             System.out.println("+--------------------------------------------------------------+");
@@ -272,7 +272,6 @@ public class DeliveryRiderMenu {
     // If customer wants to pay using QRCode, pay in the BookingMenu(viewAppointment - Pay Digital)
     private void processCashPayment() {
 
-        
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|                 PROCESS CASH PAYMENT               |");
         System.out.println("+----------------------------------------------------+");
@@ -283,7 +282,6 @@ public class DeliveryRiderMenu {
         // Only one
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
 
-        
         // Appointment - Paymetn valdiation
         if (appt == null) {
             System.out.println("\n+----------------------------------------------------+");
