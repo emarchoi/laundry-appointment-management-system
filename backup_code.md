@@ -56,4 +56,5 @@ private void viewAllAppointments() {
             System.out.println("+---------------------------------------------------------------+\n");
         }
     } // end of [2] viewAllAppointments()
+}
 ```
