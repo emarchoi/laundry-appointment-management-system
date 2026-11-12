@@ -325,6 +325,33 @@ public class AttendantMenu {
             return;
         }
 
+        System.out.println(String.format(
+                "| %-20s | %-8s | %-10s | %-12s | %-8s | %-12s | %-12s | %-10s | %-12s |",
+                "Customer", "Appt. ID", "Ref. Num", "Type", "ECF", "Status", "Price", "Payment", "Date"
+        ));
+
+        System.out.println("+---------------------------------------------------------------------------------------------------------------------------------------+");
+
+        for (Appointment appt : allAppts) {
+            Customer customer = customerDAO.getCustomerDetails(appt.getReferenceNumber());
+            String customerName = (customer != null) ? customer.getFullName() : "N/A";
+
+            System.out.println(String.format(
+                    "| %-20s | %-8d | %-10s | %-12s | %-8s | %-12s | %-12.2f | %-10s | %-12s |",
+                    customerName,
+                    appt.getAppointmentId(),
+                    appt.getReferenceNumber(),
+                    appt.getAppointmentType(),
+                    appt.getECF() > 0 ? appt.getECF() + " mins" : "0 mins",
+                    appt.getAppointmentStatus(),
+                    appt.getAppointmentTotalPrice(),
+                    appt.isPaid() ? "Paid" : "Pending",
+                    appt.getAppointmentDate()
+            ));
+        }
+
+        System.out.println("+---------------------------------------------------------------------------------------------------------------------------------------+");
+
     } // end of [2] viewAllAppointments()
 
     // Option [3]: Displays a table of physical machines (Washers/Dryers) with load, assigned order, status, and duration
