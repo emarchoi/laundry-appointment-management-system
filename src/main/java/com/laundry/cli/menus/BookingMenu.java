@@ -186,7 +186,7 @@ public class BookingMenu {
         System.out.println("\n+----------------------------------------------------+");
         System.out.println("|              SELECT APPOINTMENT TYPE               |");
         System.out.println("+----------------------------------------------------+");
-        System.out.println("| [1] Walk-In                                        |");
+        System.out.println("| [1] Pickup                                         |");
         System.out.println("| [2] Delivery                                       |");
         System.out.println("+----------------------------------------------------+");
         String appointmentType = "";
