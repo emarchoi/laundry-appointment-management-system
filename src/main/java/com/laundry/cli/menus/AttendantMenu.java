@@ -631,8 +631,8 @@ public class AttendantMenu {
                 appt.setAppointmentStatus(newStatus);
                 appt.setStaffId(loggedInStaff.getStaffId());
 
-                // If 'Ready for Pickup', assigned machines back to 'Available' and reset ECF to 0
-                if ("Ready for Pickup".equalsIgnoreCase(newStatus)) {
+                // If Ready for Pickup/Completed, assigned machines back to 'Available' and reset ECF to 0
+                if ("Ready for Pickup".equalsIgnoreCase(newStatus) || "Completed".equalsIgnoreCase(newStatus)) {
                     List<LaundryOrder> orders = orderDAO.getOrdersByAppointment(appt.getAppointmentId());
                     for (LaundryOrder order : orders) {
                         List<MachineUsage> usages = machineUsageDAO.getUsageByOrder(order.getOrderId());
@@ -651,7 +651,7 @@ public class AttendantMenu {
                     System.out.println(String.format("| New Status : %-37s |", newStatus));
                     System.out.println(String.format("| Updated By : %-37s |", loggedInStaff.getFullName()));
 
-                    if ("Ready for Pickup".equalsIgnoreCase(newStatus)) {
+                    if ("Ready for Pickup".equalsIgnoreCase(newStatus) || "Completed".equalsIgnoreCase(newStatus)) {
                         System.out.println(String.format("| Machines   : %-37s |", "Released to 'Available'"));
                     }
                     System.out.println("+----------------------------------------------------+");
