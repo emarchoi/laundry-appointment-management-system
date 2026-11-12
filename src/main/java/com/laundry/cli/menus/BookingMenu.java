@@ -194,13 +194,13 @@ public class BookingMenu {
             System.out.print("SELECT TYPE: ");
             String typeChoice = scanner.nextLine().trim();
             if ("1".equals(typeChoice)) {
-                appointmentType = "Walk-In";
+                appointmentType = "Pickup";
                 break;
             } else if ("2".equals(typeChoice)) {
                 appointmentType = "Delivery";
                 break;
             } else {
-                System.out.println("| ERROR: Enter 1 for Walk-In or 2 for Delivery.      |");
+                System.out.println("| ERROR: Enter 1 for Pickup or 2 for Delivery.      |");
             }
         }
 
