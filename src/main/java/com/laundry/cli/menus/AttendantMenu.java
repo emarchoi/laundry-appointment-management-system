@@ -550,7 +550,7 @@ public class AttendantMenu {
             System.out.print("SELECT OPTION: ");
             String choice = scanner.nextLine().trim();
 
-            String newStatus = null;
+            String newStatus = "";
 
             switch (choice) {
                 case "1":
@@ -567,6 +567,10 @@ public class AttendantMenu {
                     newStatus = "In Progress";
                     validSelection = true;
                     break;
+                case "3":
+                    newStatus = "Ready for Pickup";
+                    validSelection = true;
+                    break;
                 case "0":
                     System.out.println("\n+----------------------------------------------------+");
                     System.out.println("| Operation cancelled. Returning to menu.            |");
@@ -578,7 +582,7 @@ public class AttendantMenu {
                     System.out.println("+----------------------------------------------------+");
             }
 
-            if (newStatus != null) {
+            if (!newStatus.equals("")) {
                 appt.setAppointmentStatus(newStatus);
                 appt.setStaffId(loggedInStaff.getStaffId());
 
