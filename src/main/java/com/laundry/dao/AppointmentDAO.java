@@ -158,7 +158,7 @@ public class AppointmentDAO {
         String q = "SELECT a.*, p.PaymentID, p.AmountPaid, p.PaymentMethod, p.PaymentStatus " +
                        "FROM Appointment a " +
                        "LEFT JOIN Payment p ON a.AppointmentID = p.AppointmentID " +
-                       "ORDER BY a.AppointmentID DESC";
+                       "ORDER BY a.AppointmentDate ASC";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement s = conn.prepareStatement(q);
