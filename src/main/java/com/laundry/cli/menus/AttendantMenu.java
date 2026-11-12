@@ -313,31 +313,31 @@ public class AttendantMenu {
     // Option [2]: Displays a list of all system appointments (with complete details) and their associated orders
     private void viewAllAppointments() {
 
-        System.out.println("\n+---------------------------------------------------------------------------------------------------------------------------------------+");
-        System.out.println("|                                                        VIEW ALL APPOINTMENTS                                                          |");
-        System.out.println("+---------------------------------------------------------------------------------------------------------------------------------------+");
+        System.out.println("\n+------------------------------------------------------------------------------------------------------------------------------------+");
+        System.out.println("|                                                     VIEW ALL APPOINTMENTS                                                          |");
+        System.out.println("+------------------------------------------------------------------------------------------------------------------------------------+");
 
         List<Appointment> allAppts = appointmentDAO.getAllAppointments();
 
         if (allAppts.isEmpty()) {
-            System.out.println("| No appointments found in database.                                                                                                    |");
-            System.out.println("+---------------------------------------------------------------------------------------------------------------------------------------+");
+            System.out.println("| No appointments found in database.                                                                                                |");
+            System.out.println("+------------------------------------------------------------------------------------------------------------------------------------+");
             return;
         }
 
         System.out.println(String.format(
-                "| %-20s | %-8s | %-10s | %-12s | %-8s | %-12s | %-12s | %-10s | %-12s |",
+                "| %-20s | %-8s | %-10s | %-12s | %-8s | %-16s | %-12s | %-10s | %-10s |",
                 "Customer", "Appt. ID", "Ref. Num", "Type", "ECF", "Status", "Price", "Payment", "Date"
         ));
 
-        System.out.println("+---------------------------------------------------------------------------------------------------------------------------------------+");
+        System.out.println("+------------------------------------------------------------------------------------------------------------------------------------+");
 
         for (Appointment appt : allAppts) {
             Customer customer = customerDAO.getCustomerDetails(appt.getReferenceNumber());
             String customerName = (customer != null) ? customer.getFullName() : "N/A";
 
             System.out.println(String.format(
-                    "| %-20s | %-8d | %-10s | %-12s | %-8s | %-12s | %-12.2f | %-10s | %-12s |",
+                    "| %-20s | %-8d | %-10s | %-12s | %-8s | %-16s | PHP %-8.2f | %-10s | %-9s |",
                     customerName,
                     appt.getAppointmentId(),
                     appt.getReferenceNumber(),
@@ -349,8 +349,7 @@ public class AttendantMenu {
                     appt.getAppointmentDate()
             ));
         }
-
-        System.out.println("+---------------------------------------------------------------------------------------------------------------------------------------+");
+        System.out.println("+------------------------------------------------------------------------------------------------------------------------------------+");
 
         System.out.println("\n+-------------------------------------------------------------------------------------------------------------------------------+");
         System.out.println("|                                                          ORDERS LIST                                                           |");
