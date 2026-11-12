@@ -507,8 +507,6 @@ public class AttendantMenu {
         // Retrieve an appointment based on the reference number
         // Only update one appointment
         Appointment appt = appointmentService.getFullAppointmentDetails(refNum);
-        Customer customer = customerDAO.getCustomerDetails(refNum);
-        Payment payment = paymentDAO.getPaymentByAppointment(appt.getAppointmentId());
 
         if (appt == null) {
             System.out.println("\n+----------------------------------------------------+");
@@ -516,6 +514,9 @@ public class AttendantMenu {
             System.out.println("+----------------------------------------------------+");
             return;
         }
+        
+        Customer customer = customerDAO.getCustomerDetails(refNum);
+        Payment payment = paymentDAO.getPaymentByAppointment(appt.getAppointmentId());
 
         // Display Details
         System.out.println("\n+----------------------------------------------------+");
