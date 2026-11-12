@@ -52,7 +52,9 @@ public class Main {
                     isRunning = false;
                     break;
                 default:
-                    System.out.println("Invalid option. Please try again.\n");
+                    System.out.println("\n+----------------------------------------------------+");
+                    System.out.println("| Invalid option. Please try again.                  |");
+                    System.out.println("+----------------------------------------------------+\n");
             }
         }
 

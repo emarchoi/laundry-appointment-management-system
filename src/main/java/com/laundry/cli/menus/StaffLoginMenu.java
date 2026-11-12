@@ -46,7 +46,6 @@ public class StaffLoginMenu {
 
             if (loginChoice.equals("1")) {
                 try {
-                    
                     // Convert string ot int
                     int staffId = Integer.parseInt(staffIdInput);
                     
@@ -67,8 +66,8 @@ public class StaffLoginMenu {
                             DeliveryRiderMenu deliveryRiderMenu = new DeliveryRiderMenu(scanner, loggedInStaff);
                             deliveryRiderMenu.display();
                         }
-                        
                         inLoginMenu = false; // Exit login loop after successful session ends
+
                     } else {
                         System.out.println("\n+----------------------------------------------------+");
                         System.out.println("| ERROR: Invalid Staff ID or Name. Please try again. |");
