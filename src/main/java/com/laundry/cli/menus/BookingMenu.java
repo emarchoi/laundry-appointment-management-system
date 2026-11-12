@@ -313,7 +313,7 @@ public class BookingMenu {
         System.out.println("+----------------------------------------------------+\n");
 
         // Feedback
-        if (appointmentType.equalsIgnoreCase("Walk-In")) {
+        if (appointmentType.equalsIgnoreCase("Pickup")) {
             System.out.println("+----------------------------------------------------+");
             System.out.println("| Please bring your laundry to the shop              |");
             System.out.println("| at your convenience. Thank you!                    |");
