@@ -163,11 +163,10 @@ public class AttendantMenu {
         System.out.println("|                WEIGHING & ASSIGNMENT               |");
         System.out.println("+----------------------------------------------------+");
 
-        List<MachineUsage> allUsagesForAppt = new ArrayList<>();
-
         for (LaundryOrder order : selectedAppt.getOrders()) {
             System.out.println("+----------------------------------------------------+");
             System.out.println(String.format("| Processing Order #%-5d | Service: %-14s |", order.getOrderId(), order.getLaundryService()));
+            System.out.println("+----------------------------------------------------+");
 
             // Weigh validation from AppointmentService
             double weight = appointmentService.validateWeightInput(scanner);
@@ -280,7 +279,6 @@ public class AttendantMenu {
                     // Record machine usage in database
                     MachineUsage usage = new MachineUsage(order.getOrderId(), chosenMachineId, loadPerMachine, LocalTime.now());
                     machineUsageDAO.addMachineUsage(usage);
-                    allUsagesForAppt.add(usage);
 
                     // Automatically update machine status to 'In Use' in DB
                     machineDAO.updateMachineStatus(chosenMachineId, "In Use");
