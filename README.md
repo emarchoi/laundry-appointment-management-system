@@ -26,5 +26,5 @@ The system streamlines the monitoring of pickup and delivery laundry appointment
 ## Code Snippets
 #### Customer Appointment Menu
 <p align="center">
-  <img src="snippets/cs1.webp" alt="Code Snippet - Customer Appointment Menu" width="650" />
+  <img src="snippets/cs1.webp" alt="Code Snippet - Customer Appointment Menu" width="650" height="300" />
 </p>
