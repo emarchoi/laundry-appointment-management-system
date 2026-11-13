@@ -23,3 +23,8 @@ The system streamlines the monitoring of pickup and delivery laundry appointment
 
 - **Machine Inventory & Status Tracking:** Monitors real-time operational states (`Available`, `In Use`, `Under Maintenance`) for washers and dryers, automatically locking assigned machines during active cycles and releasing them upon completion.
 
+## Code Snippets
+### 1. Customer Appointment Menu
+<p align="center">
+  <img src="snippets/cs1.webp" alt="Code Snippet - Customer Appointment Menu" width="650" />
+</p>
