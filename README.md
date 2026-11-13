@@ -4,6 +4,8 @@ A console-based laundry management and booking application developed as a projec
 
 The system streamlines the monitoring of pickup and delivery laundry appointments, machine allocation, and payment processing using a layered OOP architecture, with real business logic in accordance with client demands.
 
+> **Note:** This project may or may not be refactored into Event-Driven Programming in the future.
+
 ## Tech Stack Used
 1. **Java** (JDBC, Maven)
 2. **MS SQL Server**
